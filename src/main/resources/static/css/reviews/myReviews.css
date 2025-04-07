@@ -1,0 +1,358 @@
+:root {
+    --busan-color: #0080c6;
+    /* 부산 대표 색상 */
+    --busan-light: #e6f4ff;
+    --busan-dark: #005a8c;
+    --secondary-color: #ffffff;
+    --text-color: #343a40;
+    --text-light: #868e96;
+    --background-color: #f8f9fa;
+    --border-color: #dee2e6;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.page-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.page-title {
+    font-size: 2rem;
+    color: var(--busan-color);
+    margin-bottom: 0.5rem;
+}
+
+.page-description {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+}
+
+.reviews-container {
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.no-reviews-icon {
+    font-size: 3rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+}
+
+.no-reviews-text {
+    font-size: 1.2rem;
+    color: var(--text-light);
+    margin-bottom: 1rem;
+}
+
+.btn {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.btn-primary {
+    background: var(--busan-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--busan-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.review-item {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.5rem 0;
+    transition: var(--transition);
+}
+
+.review-item:last-child {
+    border-bottom: none;
+}
+
+.review-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    padding: 1.5rem;
+    border-radius: 12px;
+    background-color: var(--secondary-color);
+}
+
+.review-image {
+    width: 150px;
+    height: 100px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+}
+
+.review-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.no-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-color);
+    color: var(--text-light);
+    height: 100%;
+}
+
+.no-image i {
+    font-size: 2rem;
+    opacity: 0.5;
+}
+
+.review-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.review-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-right: 1rem;
+}
+
+.review-destination {
+    display: inline-block;
+    background-color: var(--busan-light);
+    color: var(--busan-color);
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid var(--busan-color);
+}
+
+.review-date {
+    font-size: 0.85rem;
+    color: var(--text-light);
+}
+
+.review-rating {
+    margin-bottom: 0.5rem;
+    color: var(--busan-color);
+}
+
+.view-info {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    margin-left: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.view-info i {
+    margin-right: 0.3rem;
+    font-size: 0.9rem;
+}
+
+.review-excerpt {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.review-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.tag {
+    background-color: var(--busan-light);
+    padding: 0.2rem 0.6rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    color: var(--busan-color);
+    border: 1px solid var(--busan-color);
+}
+
+.review-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
+}
+
+.review-actions a {
+    font-size: 0.9rem;
+    color: var(--busan-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.review-actions a:hover {
+    text-decoration: underline;
+}
+
+.delete-btn {
+    color: var(--busan-color) !important;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    color: var(--busan-dark) !important;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-top: 50px;
+}
+
+.pagination a,
+.pagination span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: var(--secondary-color);
+    color: var(--text-color);
+    text-decoration: none;
+    transition: var(--transition);
+    font-size: 14px;
+}
+
+.pagination a:hover {
+    background-color: var(--busan-light);
+}
+
+.pagination .active {
+    background-color: var(--busan-color);
+    color: var(--secondary-color);
+}
+
+.pagination .disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
+}
+
+.modal-content {
+    background-color: var(--secondary-color);
+    margin: 15% auto;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 500px;
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.modal-title {
+    margin-bottom: 1rem;
+    color: var(--busan-color);
+    font-size: 1.5rem;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.btn-cancel {
+    background-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.btn-cancel:hover {
+    background-color: var(--text-light);
+    color: var(--secondary-color);
+}
+
+.btn-danger {
+    background: var(--busan-color);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: var(--busan-dark);
+}
+
+@media (max-width: 768px) {
+    .review-item {
+        flex-direction: column;
+    }
+
+    .review-image {
+        width: 100%;
+        height: 180px;
+        margin-right: 0;
+        margin-bottom: 1rem;
+    }
+}

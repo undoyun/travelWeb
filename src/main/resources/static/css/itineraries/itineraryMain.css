@@ -1,0 +1,598 @@
+/* 부산 여행 계획 메인 페이지 스타일 */
+:root {
+    --busan-color: #0080c6;
+    /* 부산 대표 색상 */
+    --busan-light: #e6f4ff;
+    --busan-dark: #005a8c;
+}
+
+header.transparent {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+header.transparent .logo {
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+header.transparent .nav-item {
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 60px 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 40px;
+}
+
+
+.hero-text {
+    flex: 1;
+}
+
+.hero-text h1 {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    line-height: 1.3;
+}
+
+.hero-text p {
+    font-size: 18px;
+    color: var(--text-light);
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.hero-text b {
+    color: var(--busan-color);
+    font-weight: 700;
+}
+
+.start-btn {
+    display: inline-block;
+    padding: 15px 30px;
+    background-color: var(--busan-color);
+    color: var(--secondary-color);
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    border: none;
+    cursor: pointer;
+}
+
+.start-btn:hover {
+    background-color: var(--busan-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--hover-shadow);
+}
+
+.hero-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.hero-image img:hover {
+    transform: scale(1.03);
+    box-shadow: var(--hover-shadow);
+}
+
+/* 섹션 공통 스타일 */
+section {
+    padding: 80px 30px;
+}
+
+.section-title {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.section-title h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.section-title p {
+    font-size: 18px;
+    color: var(--text-light);
+}
+
+/* 부산 구/군 섹션 스타일 */
+.busan-districts {
+    background-color: var(--background-color);
+}
+
+.districts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.district-card {
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.district-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--hover-shadow);
+}
+
+.district-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: all 0.5s ease;
+}
+
+.district-card:hover img {
+    transform: scale(1.05);
+}
+
+.district-info {
+    padding: 20px;
+}
+
+.district-info h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.district-info p {
+    font-size: 16px;
+    color: var(--text-light);
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.view-more {
+    display: inline-block;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--busan-color);
+    transition: all 0.3s ease;
+}
+
+.view-more:hover {
+    color: var(--busan-dark);
+    transform: translateX(5px);
+}
+
+.view-all-districts {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.view-all-btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: var(--busan-color);
+    color: var(--secondary-color);
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.view-all-btn:hover {
+    background-color: var(--busan-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--hover-shadow);
+}
+
+/* 부산 여행 테마 섹션 스타일 */
+.busan-themes {
+    background-color: var(--secondary-color);
+}
+
+.themes-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.theme-card {
+    background-color: var(--busan-light);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.theme-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--hover-shadow);
+}
+
+.theme-icon {
+    width: 70px;
+    height: 70px;
+    background-color: var(--secondary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+}
+
+.theme-icon i {
+    font-size: 30px;
+    color: var(--busan-color);
+}
+
+.theme-card h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+
+.theme-card p {
+    font-size: 16px;
+    color: var(--text-color);
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+.theme-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: var(--busan-color);
+    color: var(--secondary-color);
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.theme-btn:hover {
+    background-color: var(--busan-dark);
+    transform: translateY(-2px);
+}
+
+/* 부산 여행 꿀팁 섹션 스타일 */
+.busan-tips {
+    background-color: var(--background-color);
+}
+
+.tips-container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.tip-item {
+    display: flex;
+    margin-bottom: 30px;
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.tip-item:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--hover-shadow);
+}
+
+.tip-number {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--busan-color);
+    margin-right: 25px;
+    line-height: 1;
+}
+
+.tip-content h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 10px;
+}
+
+.tip-content p {
+    font-size: 16px;
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+/* 후기 섹션 스타일 */
+.testimonials {
+    background-color: var(--secondary-color);
+}
+
+.testimonials-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.testimonial-card {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    padding: 25px;
+    margin: 0 10px;
+    flex: 1;
+    min-width: 300px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.testimonial-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.testimonial-profile img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 15px;
+    object-fit: cover;
+}
+
+.testimonial-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--busan-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 20px;
+    margin-right: 15px;
+}
+
+.testimonial-profile h4 {
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0;
+    color: #333;
+}
+
+.testimonial-profile p {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+.testimonial-text {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #555;
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+.testimonial-rating {
+    color: #ffc107;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+.view-review-btn {
+    display: inline-block;
+    background-color: var(--busan-color);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 25px;
+    font-size: 14px;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s ease;
+    align-self: flex-start;
+    margin-top: auto;
+}
+
+.view-review-btn:hover {
+    background-color: var(--busan-dark);
+}
+
+/* CTA 섹션 스타일 */
+.cta {
+    background-color: var(--busan-color);
+    text-align: center;
+    padding: 80px 30px;
+}
+
+.cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+}
+
+.cta p {
+    font-size: 18px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 30px;
+}
+
+.cta-btn {
+    display: inline-block;
+    padding: 15px 30px;
+    background-color: var(--secondary-color);
+    color: var(--busan-color);
+    border-radius: 30px;
+    font-size: 18px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+}
+
+.cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--hover-shadow);
+    background-color: var(--background-color);
+}
+
+/* 모달 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow: auto;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content {
+    background-color: var(--secondary-color);
+    margin: 10% auto;
+    padding: 30px;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+    font-size: 24px;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.close {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close:hover {
+    color: var(--busan-color);
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .hero {
+        flex-direction: column;
+        padding: 40px 20px;
+    }
+
+    .hero-text h1 {
+        font-size: 28px;
+    }
+
+    .hero-text p {
+        font-size: 16px;
+    }
+
+    .start-btn {
+        padding: 12px 25px;
+        font-size: 16px;
+    }
+
+    .section-title h2 {
+        font-size: 28px;
+    }
+
+    .section-title p {
+        font-size: 16px;
+    }
+
+    .tip-item {
+        flex-direction: column;
+    }
+
+    .tip-number {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .modal-content {
+        width: 90%;
+        margin: 20% auto;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-text h1 {
+        font-size: 24px;
+    }
+
+    .section-title h2 {
+        font-size: 24px;
+    }
+
+    .cta h2 {
+        font-size: 24px;
+    }
+
+    .cta p {
+        font-size: 16px;
+    }
+
+    .cta-btn {
+        padding: 12px 25px;
+        font-size: 16px;
+    }
+}

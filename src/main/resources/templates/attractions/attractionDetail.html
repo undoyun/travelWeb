@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${attraction.mainTitle + ' - ワクワク'}">관광 명소 상세 - ワクワク</title>
+    <link rel="stylesheet" href="/css/main/main.css">
+    <link rel="stylesheet" href="/css/main/nav.css">
+    <link rel="stylesheet" href="/css/attractions/attractionDetail.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- 네비게이션 바 포함 -->
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <div class="attraction-detail-container" th:if="${attraction != null}">
+        <!-- 상단 경로 표시 -->
+        <div class="breadcrumb">
+            <a href="/attractions">관광 명소</a>
+            <i class="fas fa-chevron-right"></i>
+            <span th:text="${attraction.gugunNm}">지역</span>
+            <i class="fas fa-chevron-right"></i>
+            <span th:text="${attraction.mainTitle}">관광 명소 이름</span>
+        </div>
+
+        <div class="attraction-header">
+            <h1 class="attraction-title" th:text="${attraction.mainTitle}">관광 명소 이름</h1>
+            <div class="attraction-subtitle"
+                th:text="${attraction.subtitle != null && attraction.subtitle != '' ? attraction.subtitle : attraction.gugunNm}">
+                부제목</div>
+        </div>
+
+        <!-- 지도와 정보 섹션 -->
+        <div class="map-info-section">
+            <!-- 지도 표시 -->
+            <div class="map-container" id="map" th:if="${attraction.lat != null && attraction.lng != null}"></div>
+
+            <!-- 주요 정보 -->
+            <div class="attraction-key-info">
+                <div class="info-item" th:if="${attraction.addr1 != null && attraction.addr1 != ''}">
+                    <div class="info-label"><i class="fas fa-map-marker-alt"></i> 주소</div>
+                    <div class="info-value" th:text="${attraction.addr1}">주소</div>
+                </div>
+
+                <div class="info-item" th:if="${attraction.cntctTel != null && attraction.cntctTel != ''}">
+                    <div class="info-label"><i class="fas fa-phone"></i> 연락처</div>
+                    <div class="info-value" th:text="${attraction.cntctTel}">연락처</div>
+                </div>
+
+                <div class="info-item"
+                    th:if="${attraction.usageDayWeekAndTime != null && attraction.usageDayWeekAndTime != ''}">
+                    <div class="info-label"><i class="fas fa-clock"></i> 이용 시간</div>
+                    <div class="info-value" th:text="${attraction.usageDayWeekAndTime}">이용 시간</div>
+                </div>
+
+                <div class="info-item" th:if="${attraction.trfcInfo != null && attraction.trfcInfo != ''}">
+                    <div class="info-label"><i class="fas fa-bus"></i> 교통 정보</div>
+                    <div class="info-value" th:text="${attraction.trfcInfo}">교통 정보</div>
+                </div>
+
+                <div class="info-item" th:if="${attraction.homepageUrl != null && attraction.homepageUrl != ''}">
+                    <div class="info-label"><i class="fas fa-globe"></i> 홈페이지</div>
+                    <div class="info-value">
+                        <a th:href="${attraction.homepageUrl}" target="_blank" th:text="${attraction.homepageUrl}">홈페이지
+                            URL</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 이미지 섹션 -->
+        <div class="attraction-image-container">
+            <img class="attraction-image" th:src="${attraction.mainImgNormal}" th:alt="${attraction.mainTitle}"
+                onerror="this.src='/img/no-image.jpg'">
+        </div>
+
+        <!-- 상세 설명 섹션 -->
+        <div class="attraction-content-section">
+            <h2 class="section-title"><i class="fas fa-info-circle"></i> 상세 정보</h2>
+            <div class="attraction-content" th:utext="${attraction.itemcntnts}">
+                관광 명소 상세 내용
+            </div>
+        </div>
+
+        <!-- 추가 정보 섹션 -->
+        <div class="attraction-additional-info" th:if="${(attraction.usageAmount != null && attraction.usageAmount != '') || 
+                    (attraction.hldyInfo != null && attraction.hldyInfo != '')}">
+            <h2 class="section-title"><i class="fas fa-plus-circle"></i> 추가 정보</h2>
+            <div class="attraction-info-grid">
+                <div class="info-item" th:if="${attraction.usageAmount != null && attraction.usageAmount != ''}">
+                    <div class="info-label"><i class="fas fa-coins"></i> 이용 요금</div>
+                    <div class="info-value" th:text="${attraction.usageAmount}">이용 요금</div>
+                </div>
+
+                <div class="info-item" th:if="${attraction.hldyInfo != null && attraction.hldyInfo != ''}">
+                    <div class="info-label"><i class="fas fa-calendar-times"></i> 휴일 정보</div>
+                    <div class="info-value" th:text="${attraction.hldyInfo}">휴일 정보</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 관련 명소 섹션을 주변 맛집 섹션으로 변경 -->
+        <div class="nearby-restaurants">
+            <h2 class="section-title"><i class="fas fa-utensils"></i> 주변 맛집</h2>
+
+            <!-- 로딩 인디케이터 -->
+            <div id="loading-restaurants" class="loading-container">
+                <div class="loading-spinner"></div>
+                <p>주변 맛집을 검색 중입니다...</p>
+            </div>
+
+            <!-- 결과 없음 메시지 -->
+            <div id="no-restaurants" class="no-results" style="display: none;">
+                <i class="fas fa-search"></i>
+                <p>주변에 맛집 정보가 없습니다.</p>
+            </div>
+
+            <!-- 맛집 목록 -->
+            <div id="restaurants-grid" class="nearby-restaurants-grid">
+                <!-- 맛집 데이터는 JavaScript로 동적 생성됩니다 -->
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="/attractions" class="back-btn"><i class="fas fa-arrow-left"></i> 목록으로 돌아가기</a>
+        </div>
+    </div>
+
+    <!-- 관광 명소가 없을 경우 -->
+    <div class="not-found-container" th:if="${attraction == null}">
+        <i class="fas fa-exclamation-circle"></i>
+        <h1>관광 명소를 찾을 수 없습니다.</h1>
+        <p>요청하신 관광 명소 정보를 찾을 수 없습니다.</p>
+        <a href="/attractions" class="back-btn"><i class="fas fa-arrow-left"></i> 목록으로 돌아가기</a>
+    </div>
+
+    <!-- 카카오맵 API -->
+    <script
+        src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=941282e8b7c94ddf03067d4aca6b05f0&libraries=services"></script>
+    <script>
+        // Thymeleaf에서 전달된 lat, lng 값 가져오기
+        var latitude = /*[[${ attraction.lat }]]*/ '[[${attraction.lat}]]'; // 위도
+        var longitude = /*[[${ attraction.lng }]]*/ '[[${attraction.lng}]]'; // 경도
+        var attractionName = /*[[${ attraction.mainTitle }]]*/ '[[${attraction.mainTitle}]]'; // 관광지 이름
+
+        // 지도 옵션 설정
+        var mapContainer = document.getElementById('map'); // 지도를 표시할 div
+        mapOption = {
+            center: new kakao.maps.LatLng(latitude, longitude), // 서버에서 받은 lat, lng로 지도 중심 설정
+            level: 3, // 지도의 확대 레벨
+            mapTypeId: kakao.maps.MapTypeId.ROADMAP // 지도 종류
+        };
+
+        // 지도를 생성한다
+        var map = new kakao.maps.Map(mapContainer, mapOption);
+
+        // 지도에 마커를 생성하고 표시한다
+        var marker = new kakao.maps.Marker({
+            position: new kakao.maps.LatLng(latitude, longitude), // 마커의 좌표
+            map: map // 마커를 표시할 지도 객체
+        });
+
+        // 인포윈도우 생성
+        var infowindow = new kakao.maps.InfoWindow({
+            content: '<div style="padding:5px;font-size:12px;text-align:center;">' + attractionName + '</div>'
+        });
+        infowindow.open(map, marker);
+
+        // 지도 크기 조정을 위한 리사이즈 이벤트 처리
+        window.addEventListener('resize', function () {
+            map.relayout();
+        });
+
+        // 주변 맛집 검색 함수
+        function searchNearbyRestaurants() {
+            // 로딩 표시
+            document.getElementById('loading-restaurants').style.display = 'block';
+            document.getElementById('no-restaurants').style.display = 'none';
+            document.getElementById('restaurants-grid').innerHTML = '';
+
+            // 장소 검색 객체 생성
+            var places = new kakao.maps.services.Places();
+
+            // 검색 옵션
+            var searchOptions = {
+                location: new kakao.maps.LatLng(latitude, longitude),
+                radius: 1000, // 1km 반경 내 검색
+                sort: kakao.maps.services.SortBy.DISTANCE // 거리순 정렬
+            };
+
+            // 음식점 카테고리로 검색
+            places.categorySearch('FD6', function (result, status) {
+                // 로딩 숨기기
+                document.getElementById('loading-restaurants').style.display = 'none';
+
+                if (status === kakao.maps.services.Status.OK) {
+                    // 검색 결과가 있는 경우
+                    displayRestaurants(result);
+
+                    // 지도에 맛집 마커 표시
+                    addRestaurantMarkers(result);
+                } else {
+                    // 검색 결과가 없는 경우
+                    document.getElementById('no-restaurants').style.display = 'block';
+                }
+            }, searchOptions);
+        }
+
+        // 맛집 목록 표시 함수
+        function displayRestaurants(restaurants) {
+            var container = document.getElementById('restaurants-grid');
+
+            // 최대 6개까지만 표시
+            var maxDisplay = Math.min(restaurants.length, 6);
+
+            if (maxDisplay === 0) {
+                document.getElementById('no-restaurants').style.display = 'block';
+                return;
+            }
+
+            for (var i = 0; i < maxDisplay; i++) {
+                var restaurant = restaurants[i];
+
+                // 거리 계산 (미터 단위)
+                var distance = restaurant.distance;
+                var distanceText = distance < 1000 ? distance + 'm' : (distance / 1000).toFixed(1) + 'km';
+
+                // 카카오 Place ID를 이용한 이미지 URL 생성 (카카오 Place ID 기반 이미지)
+                var imageUrl = 'https://place.map.kakao.com/photoService/photoList?id=' + restaurant.id;
+
+                // 카드 생성
+                var card = document.createElement('a');
+                card.className = 'restaurant-card';
+                card.href = 'https://map.kakao.com/link/to/' + restaurant.id;
+                card.target = '_blank';
+
+                // 카드 내용 구성
+                card.innerHTML = `
+                    <div class="restaurant-image" style="background-image: url('https://img.icons8.com/color/96/000000/restaurant.png'); background-size: 60px; background-repeat: no-repeat; background-position: center; background-color: #f8f9fa;">
+                        <span class="restaurant-category">${restaurant.category_name.split('>').pop().trim()}</span>
+                    </div>
+                    <div class="restaurant-info">
+                        <h3>${restaurant.place_name}</h3>
+                        <p>${restaurant.phone || '연락처 정보 없음'}</p>
+                        <div class="restaurant-address">
+                            <i class="fas fa-map-marker-alt"></i> ${restaurant.road_address_name || restaurant.address_name}
+                            <span class="restaurant-distance">${distanceText}</span>
+                        </div>
+                    </div>
+                `;
+
+                container.appendChild(card);
+
+                // 이미지 로드 시도 (CORS 정책으로 인해 직접 접근은 어려울 수 있음)
+                (function (cardElement, placeId) {
+                    fetch('/api/restaurant-image?id=' + placeId, { method: 'GET' })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.imageUrl) {
+                                cardElement.querySelector('.restaurant-image').style.backgroundImage = `url('${data.imageUrl}')`;
+                                cardElement.querySelector('.restaurant-image').style.backgroundSize = 'cover';
+                            }
+                        })
+                        .catch(error => console.log('이미지를 가져올 수 없습니다.'));
+                })(card, restaurant.id);
+            }
+        }
+
+        // 지도에 맛집 마커 추가
+        function addRestaurantMarkers(restaurants) {
+            // 최대 6개까지만 마커 표시
+            var maxMarkers = Math.min(restaurants.length, 6);
+
+            for (var i = 0; i < maxMarkers; i++) {
+                var restaurant = restaurants[i];
+
+                // 맛집 마커 생성
+                var restaurantMarker = new kakao.maps.Marker({
+                    position: new kakao.maps.LatLng(restaurant.y, restaurant.x),
+                    map: map
+                });
+
+                // 맛집 인포윈도우 생성
+                (function (marker, place) {
+                    // 마커 클릭 이벤트
+                    kakao.maps.event.addListener(marker, 'click', function () {
+                        var infowindow = new kakao.maps.InfoWindow({
+                            content: '<div style="padding:5px;font-size:12px;width:150px;text-align:center;word-break:keep-all;">' +
+                                place.place_name + '<br><span style="font-size:11px;color:#888;">' +
+                                place.category_name.split('>').pop().trim() + '</span></div>'
+                        });
+                        infowindow.open(map, marker);
+
+                        // 3초 후 인포윈도우 닫기
+                        setTimeout(function () {
+                            infowindow.close();
+                        }, 3000);
+                    });
+                })(restaurantMarker, restaurant);
+            }
+        }
+
+        // 페이지 로드 완료 후 주변 맛집 검색 실행
+        window.addEventListener('load', function () {
+            // 지도가 완전히 로드된 후 맛집 검색 실행
+            setTimeout(searchNearbyRestaurants, 1000);
+        });
+    </script>
+</body>
+<script th:src="@{/js/main/main.js}"></script>
+<script th:src="@{/js/main/nav.js}"></script>
+
+</html>

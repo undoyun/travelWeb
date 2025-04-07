@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>여행 리뷰 | ワクワク</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/reviews/reviewsList.css}">
+</head>
+
+<body>
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <div class="reviews-wrapper">
+        <!-- 페이지 헤더 영역 -->
+        <div class="page-header">
+            <h1 class="page-title">부산 여행 후기 게시판</h1>
+        </div>
+
+        <!-- 기능 컨트롤 영역 -->
+        <div class="controls-area">
+            <!-- 검색 영역 -->
+            <div class="search-box">
+                <form class="search-form" action="/reviews/search" method="get">
+                    <input type="text" class="search-input" name="keyword" placeholder="리뷰 검색 (제목, 내용, 장소, 작성자)" th:value="${keyword}">
+                    <button type="submit" class="search-btn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- 필터 영역 -->
+            <div class="filter-box">
+                <div class="filter-options">
+                    <select class="filter-select" id="sort" onchange="applyFilters()">
+                        <option value="recent" th:selected="${sort == 'recent'}">최신순</option>
+                        <option value="rating" th:selected="${sort == 'rating'}">별점순</option>
+                        <option value="popular" th:selected="${sort == 'popular'}">인기순</option>
+                    </select>
+                </div>
+                <a th:if="${#authorization.expression('isAuthenticated()')}" th:href="@{/reviews/my-reviews}" class="my-reviews-btn">
+                    <i class="fas fa-user"></i> 내 리뷰 모아보기
+                </a>
+            </div>
+        </div>
+
+        <!-- 검색 결과 표시 -->
+        <div class="search-result" th:if="${keyword != null && !keyword.isEmpty()}">
+            "<span th:text="${keyword}"></span>" 검색 결과: <span th:text="${reviewsPage.totalElements}"></span>개의 리뷰를 찾았습니다
+        </div>
+
+        <!-- 리뷰가 없을 경우 -->
+        <div th:if="${reviewsPage == null || reviewsPage.empty}" class="no-reviews">
+            <div class="no-reviews-icon">
+                <i class="fas fa-search"></i>
+            </div>
+            <h2 class="no-reviews-text">등록된 리뷰가 없습니다</h2>
+            <p>첫 번째 리뷰를 작성하고 다른 여행자들과 부산 여행 경험을 공유해보세요!</p>
+        </div>
+
+        <!-- 게시판 형태 리뷰 목록 -->
+        <div th:unless="${reviewsPage == null || reviewsPage.empty}" class="board-container">
+            <table class="board-table">
+                <thead>
+                    <tr>
+                        <th class="board-id">번호</th>
+                        <th class="board-destination">지역</th>
+                        <th class="board-title-col">제목</th>
+                        <th class="board-author">작성자</th>
+                        <th class="board-date">작성일</th>
+                        <th class="board-views">조회</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="review, status : ${reviewsPage.content}">
+                        <td class="board-id" th:text="${reviewsPage.totalElements - reviewsPage.number * reviewsPage.size - status.index}">
+                        </td>
+                        <td class="board-destination">
+                            <span class="destination-tag" th:text="${review.destination}">해운대</span>
+                        </td>
+                        <td class="board-title-col">
+                            <a th:href="@{/reviews/{id}(id=${review.id})}" class="board-title-link">
+                                <span class="review-rating-small">
+                                    <i class="fas fa-star" th:each="i : ${#numbers.sequence(1, review.rating)}"></i>
+                                    <i class="far fa-star" th:each="i : ${#numbers.sequence(review.rating + 1, 5)}"></i>
+                                </span>
+                                <span th:text="${review.title}">부산 여행 후기</span>
+                                <span class="comment-count" th:if="${review.commentCount > 0}">
+                                    <i class="fas fa-comment"></i>
+                                    <span th:text="${review.commentCount}">5</span>
+                                </span>
+                            </a>
+                        </td>
+                        <td class="board-author">
+                            <div class="author-info">
+                                <span th:text="${review.userName}">여행자</span>
+                            </div>
+                        </td>
+                        <td class="board-date" th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd')}">
+                        </td>
+                        <td class="board-views" th:text="${review.viewCount != null ? review.viewCount : 0}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination" th:if="${reviewsPage != null && reviewsPage.totalPages > 1}">
+            <!-- 이전 페이지 링크 -->
+            <a th:if="${reviewsPage.hasPrevious()}" th:href="@{/reviews/list(page=${reviewsPage.number - 1}, sort=${sort}, keyword=${keyword})}" aria-label="Previous">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+            <span th:unless="${reviewsPage.hasPrevious()}" class="disabled">
+                <i class="fas fa-chevron-left"></i>
+            </span>
+
+            <!-- 페이지 번호 -->
+            <a th:each="pageNumber : ${#numbers.sequence(0, reviewsPage.totalPages - 1)}" th:if="${pageNumber >= reviewsPage.number - 2 && pageNumber <= reviewsPage.number + 2}" th:href="@{/reviews/list(page=${pageNumber}, sort=${sort}, keyword=${keyword})}" th:text="${pageNumber + 1}" th:class="${pageNumber == reviewsPage.number ? 'active' : ''}">
+            </a>
+
+            <!-- 다음 페이지 링크 -->
+            <a th:if="${reviewsPage.hasNext()}" th:href="@{/reviews/list(page=${reviewsPage.number + 1}, sort=${sort}, keyword=${keyword})}" aria-label="Next">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+            <span th:unless="${reviewsPage.hasNext()}" class="disabled">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+        </div>
+    </div>
+
+    <script>
+        // 필터 적용 함수
+        function applyFilters() {
+            const sort = document.getElementById('sort').value;
+            const url = new URL(window.location);
+
+            url.searchParams.set('sort', sort);
+            url.searchParams.set('page', 0); // 필터 변경 시 첫 페이지로 이동
+
+            window.location.href = url.toString();
+        }
+    </script>
+    <script th:src="@{/js/main/nav.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문의 상세 | ワクワク</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <style>
+        :root {
+            --busan-color: #0080c6;
+            /* 부산 대표 색상 */
+            --busan-light: #e6f4ff;
+            --busan-dark: #005a8c;
+            --busan-accent: #ffc107;
+            /* 강조 색상 */
+            --secondary-color: #ffffff;
+            --text-color: #343a40;
+            --text-light: #868e96;
+            --background-color: #f8f9fa;
+            --border-color: #dee2e6;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+
+        /* 페이지 네비게이션 */
+        .page-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--busan-light);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--busan-dark);
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .page-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 70%;
+            background: linear-gradient(to bottom, var(--busan-color), var(--busan-dark));
+            border-radius: 3px;
+        }
+
+        .board-navigation {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--busan-light);
+            color: var(--busan-dark);
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .back-link:hover {
+            background-color: var(--busan-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 128, 198, 0.2);
+        }
+
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+
+        /* 게시판 스타일 - 컨테이너 공통 */
+        .board-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        /* 게시물 헤더 */
+        .post-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, white 0%, var(--busan-light) 100%);
+        }
+
+        .post-category {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4rem 1rem;
+            background-color: var(--busan-light);
+            color: var(--busan-dark);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .post-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            color: var(--text-color);
+            line-height: 1.4;
+        }
+
+        .post-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .meta-item i {
+            color: var(--busan-color);
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .status-badge.answered {
+            background: #efffef;
+            color: #10b981;
+            border: 1px solid #dcfce7;
+        }
+
+        .status-badge.waiting {
+            background: #fff7ed;
+            color: #f59e0b;
+            border: 1px solid #fff3e0;
+        }
+
+        /* 게시물 컨텐츠 */
+        .post-content {
+            padding: 2rem;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            white-space: pre-line;
+            min-height: 180px;
+        }
+
+        /* 답변 카드 */
+        .answer-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .answer-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--busan-light);
+        }
+
+        .answer-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--busan-dark);
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .answer-content {
+            padding: 2rem;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            white-space: pre-line;
+        }
+
+        /* 답변 대기 카드 */
+        .no-answer-card {
+            background: linear-gradient(135deg, white 0%, var(--busan-light) 100%);
+            border-radius: 15px;
+            padding: 3rem 2rem;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .no-answer-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0, 128, 198, 0.2);
+        }
+
+        .no-answer-icon i {
+            font-size: 2.5rem;
+            color: var(--busan-color);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .no-answer-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--busan-dark);
+            margin-bottom: 1rem;
+        }
+
+        .no-answer-text {
+            color: var(--text-light);
+            font-size: 1.05rem;
+            line-height: 1.6;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* 버튼 */
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background-color: var(--busan-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--busan-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 128, 198, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--busan-light);
+            color: var(--busan-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .btn-danger {
+            background-color: #ffeeee;
+            color: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background-color: #e74c3c;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.2);
+        }
+
+        .btn-edit {
+            background-color: var(--busan-light);
+            color: var(--busan-dark);
+        }
+
+        .btn-edit:hover {
+            background-color: var(--busan-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 128, 198, 0.2);
+        }
+
+        /* 모달 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: modal-slide-up 0.3s ease-out;
+        }
+
+        @keyframes modal-slide-up {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.2rem;
+            right: 1.5rem;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+
+            .page-navigation {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .post-header, 
+            .post-content, 
+            .answer-header, 
+            .answer-content {
+                padding: 1.2rem;
+            }
+
+            .no-answer-card {
+                padding: 2rem 1.2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .post-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 네비게이션 바 포함 -->
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <div class="container">
+        <!-- 페이지 네비게이션 -->
+        <div class="page-navigation">
+            <h1 class="page-title">문의 상세보기</h1>
+            <div class="board-navigation">
+                <a th:href="@{/counseling}" class="back-link">
+                    <i class="fas fa-list"></i> 목록으로 돌아가기
+                </a>
+            </div>
+        </div>
+
+        <!-- 문의 컨테이너 -->
+        <div class="board-container">
+            <!-- 문의 헤더 -->
+            <div class="post-header">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+                    <div class="post-category" th:text="${counseling.category.displayName}">일반 문의</div>
+                    <span class="status-badge" th:classappend="${counseling.isAnswered ? 'answered' : 'waiting'}">
+                        <i th:class="${counseling.isAnswered ? 'fas fa-check-circle' : 'fas fa-circle-notch fa-spin'}"></i>
+                        <span th:text="${counseling.isAnswered ? '답변완료' : '검토중'}">상태</span>
+                    </span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h1 class="post-title" th:text="${counseling.title}">문의 제목</h1>
+                    <div style="margin-left: 1rem; display: flex; gap: 0.5rem;">
+                        <a th:if="${!counseling.isAnswered}" th:href="@{/counseling/edit/{id}(id=${counseling.id})}" class="btn btn-edit" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                            <i class="fas fa-edit"></i> 수정
+                        </a>
+                        <button id="deleteBtn" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                            <i class="fas fa-trash-alt"></i> 삭제
+                        </button>
+                    </div>
+                </div>
+                <div class="post-meta">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span th:text="${#temporals.format(counseling.createdAt, 'yyyy년 MM월 dd일 HH:mm')}">2023년 8월 1일 14:30</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 문의 내용 -->
+            <div class="post-content">
+                <p th:text="${counseling.content}">문의 내용이 여기에 표시됩니다.</p>
+            </div>
+        </div>
+
+        <!-- 답변 영역 -->
+        <div th:if="${counseling.isAnswered}" class="answer-card">
+            <div class="answer-header">
+                <div class="answer-title">
+                    <i class="fas fa-reply"></i>
+                    <span>답변</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="status-badge answered">
+                        <i class="fas fa-check-circle"></i>
+                        <span>답변완료</span>
+                    </div>
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <span th:text="${#temporals.format(counseling.answeredAt, 'yyyy년 MM월 dd일 HH:mm')}">2023년 8월 2일 10:15</span>
+                    </div>
+                </div>
+            </div>
+            <div class="answer-content">
+                <p th:text="${counseling.answer}">답변 내용이 표시됩니다.</p>
+            </div>
+        </div>
+
+        <!-- 미답변 안내 -->
+        <div th:unless="${counseling.isAnswered}" class="no-answer-card">
+            <div class="no-answer-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <h2 class="no-answer-title">답변 대기 중</h2>
+            <p class="no-answer-text">문의하신 내용을 검토 중입니다. 빠른 시일 내에 답변 드리겠습니다.</p>
+        </div>
+
+        <!-- 추가 액션 버튼 -->
+        <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+            <a th:href="@{/counseling/create}" class="btn btn-primary">
+                <i class="fas fa-pen"></i> 새 문의 작성
+            </a>
+        </div>
+    </div>
+
+    <!-- 삭제 확인 모달 -->
+    <div id="deleteModal" class="modal-overlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
+                    문의 삭제
+                </h3>
+                <button id="closeModal" class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>정말로 이 문의를 삭제하시겠습니까?</p>
+                <p style="color: #e74c3c; font-size: 0.9rem; margin-top: 1rem;">
+                    <i class="fas fa-info-circle"></i>
+                    삭제한 문의는 복구할 수 없습니다.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelDelete" class="btn btn-secondary">취소</button>
+                <form th:action="@{/counseling/{id}/delete(id=${counseling.id})}" method="post" style="margin: 0;">
+                    <button type="submit" class="btn btn-danger">삭제</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 모달 관련 스크립트
+        const deleteBtn = document.getElementById('deleteBtn');
+        const deleteModal = document.getElementById('deleteModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelDelete = document.getElementById('cancelDelete');
+
+        deleteBtn.addEventListener('click', function() {
+            deleteModal.style.display = 'flex';
+        });
+
+        closeModal.addEventListener('click', function() {
+            deleteModal.style.display = 'none';
+        });
+
+        cancelDelete.addEventListener('click', function() {
+            deleteModal.style.display = 'none';
+        });
+
+        // 모달 외부 클릭시 닫기
+        window.addEventListener('click', function(event) {
+            if (event.target === deleteModal) {
+                deleteModal.style.display = 'none';
+            }
+        });
+    </script>
+
+    <script th:src="@{/js/main/nav.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ワクワク 관리자 - 리뷰 관리</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/adminNav.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminMain.css}">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <style>
+        :root {
+            --primary: #3080E0;
+            --primary-light: #EBF2FD;
+            --primary-dark: #1E63C4;
+            --secondary: #6C757D;
+            --success: #28A745;
+            --danger: #DC3545;
+            --warning: #FFC107;
+            --info: #17A2B8;
+            --light: #F8F9FA;
+            --dark: #343A40;
+            --background: #F8F9FA;
+            --border: #DEE2E6;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--background);
+            color: #333;
+        }
+
+        /* 관리자 대시보드 컨테이너 */
+        .admin-container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* 메인 콘텐츠 스타일 */
+        .main-content {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            padding: 25px;
+            height: 100%;
+            min-height: 600px;
+        }
+
+        /* 콘텐츠 헤더 */
+        .content-header {
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .content-header h2 {
+            font-weight: 600;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+            color: var(--dark);
+        }
+
+        .content-header p {
+            color: var(--secondary);
+            margin-bottom: 0;
+            font-size: 0.9rem;
+        }
+
+        /* 사이드 메뉴 */
+        .side-menu {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .side-menu-header {
+            padding: 15px 20px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+            color: var(--dark);
+            background-color: var(--light);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .side-menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--secondary);
+            border-bottom: 1px solid var(--border);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .side-menu-item:last-child {
+            border-bottom: none;
+            border-radius: 0 0 10px 10px;
+        }
+
+        .side-menu-item:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .side-menu-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .badges-group {
+            display: flex;
+            gap: 5px;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.3em 0.5em;
+            border-radius: 4px;
+            background-color: var(--light);
+            color: var(--secondary);
+        }
+
+        .badge.bg-danger {
+            background-color: var(--danger) !important;
+            color: white !important;
+        }
+
+        /* 필터 버튼 */
+        .filter-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background-color: #fff;
+            color: var(--secondary);
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary-light);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* 리뷰 카드 스타일 */
+        .review-card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            background-color: white;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border);
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .review-header {
+            padding: 15px 20px;
+            background-color: var(--primary-light);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .review-user {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--secondary);
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .review-date {
+            color: var(--secondary);
+            font-size: 0.85rem;
+        }
+
+        .review-rating {
+            display: flex;
+            align-items: center;
+        }
+
+        .rating-stars {
+            color: var(--warning);
+            margin-right: 5px;
+        }
+
+        .review-content {
+            padding: 20px;
+        }
+
+        .review-text {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .review-image-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .review-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+        .review-category {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            background-color: var(--light);
+            color: var(--dark);
+            margin-right: 10px;
+        }
+
+        .review-actions {
+            border-top: 1px solid var(--border);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .reported-badge {
+            display: inline-block;
+            background-color: var(--danger);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* 테이블 스타일 */
+        .table {
+            width: 100%;
+            background-color: #fff;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+        }
+
+        .table th {
+            background-color: var(--light);
+            color: var(--dark);
+            font-weight: 600;
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .table td {
+            padding: 12px 15px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .table th.text-center,
+        .table td.text-center {
+            text-align: center !important;
+        }
+
+        /* 텍스트 정렬 클래스 강화 */
+        .text-center {
+            text-align: center !important;
+        }
+
+        .text-left {
+            text-align: left !important;
+        }
+
+        /* 작성일 포맷 통일 */
+        .date-cell {
+            font-size: 0.9rem;
+            color: var(--secondary);
+        }
+
+        /* 사용자 정보 스타일 */
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .table tr:hover {
+            background-color: var(--primary-light);
+        }
+
+        /* 텍스트 자르기 스타일 */
+        .text-truncate {
+            max-width: 100%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: inline-block;
+        }
+
+        /* 평점 스타일 */
+        .rating-value {
+            font-weight: bold;
+            color: var(--warning);
+        }
+
+        /* 검색 폼 */
+        .search-filters {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(48, 128, 224, 0.25);
+        }
+
+        /* 페이지네이션 */
+        .pagination {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .page-item {
+            margin: 0 3px;
+        }
+
+        .page-link {
+            color: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            transition: all 0.2s;
+        }
+
+        .page-link:hover {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--primary-light);
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-item.disabled .page-link {
+            color: var(--secondary);
+            cursor: not-allowed;
+        }
+
+        /* 버튼 그룹 */
+        .btn-group .btn {
+            border-radius: 4px;
+            padding: 5px 10px;
+            font-size: 0.85rem;
+        }
+
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-outline-primary:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            color: var(--secondary);
+            border-color: var(--secondary);
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-outline-danger {
+            color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .btn-outline-danger:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        /* 액션 버튼 컨테이너 */
+        .action-btn-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        /* 배지 스타일 개선 */
+        .badge.bg-light {
+            background-color: var(--primary-light) !important;
+            color: var(--primary) !important;
+            font-weight: 500;
+            padding: 5px 10px;
+            display: inline-block;
+            width: auto;
+            text-align: center;
+        }
+
+        /* 리뷰 링크 스타일 */
+        .review-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            width: 100%;
+        }
+
+        .review-link:hover,
+        .review-link:focus,
+        .review-link:active,
+        .review-link:visited {
+            color: var(--primary);
+            text-decoration: none;
+            background-color: transparent;
+        }
+
+        /* 테이블 반응형 조정 */
+        @media (max-width: 768px) {
+
+            .table th,
+            .table td {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+
+            .table th:nth-child(5),
+            .table td:nth-child(5),
+            .table th:nth-child(6),
+            .table td:nth-child(6) {
+                display: none;
+            }
+        }
+    </style>
+    <script>
+        function toggleMenu() {
+            const dropdown = document.getElementById('dropdownMenu');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        // 페이지 로드 시 hover 이벤트 추가
+        document.addEventListener('DOMContentLoaded', function () {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('dropdownMenu');
+
+            if (userMenu && dropdown) {
+                // 마우스 오버 시 드롭다운 표시
+                userMenu.addEventListener('mouseenter', function () {
+                    dropdown.classList.add('show');
+                });
+
+                // 마우스가 떠날 때 드롭다운 숨김
+                userMenu.addEventListener('mouseleave', function () {
+                    dropdown.classList.remove('show');
+                });
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <!-- 상단 네비게이션 바 포함 -->
+    <div th:replace="~{admin/adminNav :: adminTopNav}"></div>
+
+    <div class="container py-4">
+        <div class="row">
+            <!-- 왼쪽 사이드 메뉴 -->
+            <div class="col-md-3">
+                <div class="side-menu">
+                    <div class="side-menu-header">
+                        리뷰
+                    </div>
+                    <a th:href="@{/admin/reviews}" class="side-menu-item"
+                        th:classappend="${status == 'ALL' ? 'active' : ''}">
+                        전체 리뷰
+                        <div class="badges-group">
+                            <span class="badge" th:text="${reviewsPage.totalElements}">0</span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="side-menu mt-4">
+                    <div class="side-menu-header">
+                        평점
+                    </div>
+                    <a href="javascript:void(0)" class="side-menu-item filter-btn-rating" data-rating="all"
+                        th:classappend="${minRating == null ? 'active' : ''}">
+                        전체 평점
+                    </a>
+                    <a href="javascript:void(0)" class="side-menu-item filter-btn-rating" data-rating="5"
+                        th:classappend="${minRating == 5 ? 'active' : ''}">
+                        5점
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                    </a>
+                    <a href="javascript:void(0)" class="side-menu-item filter-btn-rating" data-rating="4"
+                        th:classappend="${minRating == 4 && maxRating == 4 ? 'active' : ''}">
+                        4점
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="fas fa-star"></i><i class="far fa-star"></i>
+                        </div>
+                    </a>
+                    <a href="javascript:void(0)" class="side-menu-item filter-btn-rating" data-rating="3"
+                        th:classappend="${minRating == 3 && maxRating == 3 ? 'active' : ''}">
+                        3점
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                                class="far fa-star"></i><i class="far fa-star"></i>
+                        </div>
+                    </a>
+                    <a href="javascript:void(0)" class="side-menu-item filter-btn-rating" data-rating="2"
+                        th:classappend="${minRating == 2 && maxRating == 2 ? 'active' : ''}">
+                        2점
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i
+                                class="far fa-star"></i><i class="far fa-star"></i>
+                        </div>
+                    </a>
+                    <a href="javascript:void(0)" class="side-menu-item filter-btn-rating" data-rating="1"
+                        th:classappend="${minRating == 1 && maxRating == 1 ? 'active' : ''}">
+                        1점
+                        <div class="rating-stars">
+                            <i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i><i
+                                class="far fa-star"></i><i class="far fa-star"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 메인 콘텐츠 -->
+            <div class="col-md-9">
+                <div class="main-content">
+
+                    <div class="content-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h2>리뷰 관리</h2>
+                                <p>관광 명소에 대한 사용자 리뷰를 관리하고 모니터링합니다.</p>
+                            </div>
+                            <!-- 검색 영역 -->
+                            <div class="d-flex">
+                                <form th:action="@{/admin/reviews}" method="get" id="searchForm" class="d-flex">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" name="searchTerm"
+                                            th:value="${searchTerm}" placeholder="리뷰 제목">
+                                        <button class="btn btn-primary" type="submit">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                    <input type="hidden" name="status" th:value="${status}">
+                                    <input type="hidden" name="minRating" th:value="${minRating}">
+                                    <input type="hidden" name="maxRating" th:value="${maxRating}">
+                                    <input type="hidden" name="page" th:value="${reviewsPage.number}">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 리뷰 목록 테이블 -->
+                    <div class="table-responsive mb-4">
+                        <table class="table mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 5%">#</th>
+                                    <th class="text-left" style="width: 35%">제목</th>
+                                    <th class="text-left" style="width: 20%">작성자</th>
+                                    <th class="text-left" style="width: 15%">작성일</th>
+                                    <th class="text-center" style="width: 10%">조회수</th>
+                                    <th class="text-center" style="width: 7%">평점</th>
+                                    <th class="text-center" style="width: 8%">액션</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:if="${reviews == null || reviews.empty}">
+                                    <td colspan="7" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-2x text-muted mb-3"></i>
+                                        <p>등록된 리뷰가 없습니다.</p>
+                                    </td>
+                                </tr>
+                                <tr th:each="review, index : ${reviews}" th:if="${reviews != null && !reviews.empty}">
+                                    <td class="text-center" th:text="${index.count}">1</td>
+                                    <td class="text-left" style="max-width: 200px;">
+                                        <a th:href="@{/reviews/{id}(id=${review.id})}" class="review-link">
+                                            <span th:text="${review.title ?: '제목 없음'}">리뷰 제목</span>
+                                            <span class="badge bg-danger ms-2" th:if="${review.reportCount > 0}">
+                                                <i class="fas fa-flag me-1"></i><span th:text="${review.reportCount}">2</span>
+                                            </span>
+                                        </a>
+                                    </td>
+                                    <td class="text-left">
+                                        <div class="user-info">
+                                            <div class="user-avatar me-2">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <span
+                                                th:text="${review.user != null ? review.user.username : '사용자'}">사용자</span>
+                                        </div>
+                                    </td>
+                                    <td class="date-cell"
+                                        th:text="${review.createdAt != null ? #temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm') : '-'}">
+                                        2023-06-15</td>
+                                    <td class="text-center" th:text="${review.viewCount ?: 0}">0</td>
+                                    <td class="text-center" th:text="${review.rating}">4.5</td>
+                                    <td class="text-center">
+                                        <div class="action-btn-container">
+                                            <button class="btn btn-sm btn-danger" title="삭제"
+                                                th:attr="data-review-id=${review.id}"
+                                                onclick="confirmDeleteReview(this.getAttribute('data-review-id'))">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 페이지네이션 -->
+                    <div class="d-flex justify-content-center mt-4">
+                        <nav aria-label="Page navigation" th:if="${reviewsPage != null && reviewsPage.totalPages > 0}">
+                            <ul class="pagination">
+                                <li class="page-item" th:classappend="${reviewsPage.first ? 'disabled' : ''}">
+                                    <a class="page-link"
+                                        th:href="@{/admin/reviews(page=${reviewsPage.number - 1}, status=${status}, minRating=${minRating}, maxRating=${maxRating}, searchTerm=${searchTerm})}"
+                                        aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+
+                                <li class="page-item" th:each="i : ${#numbers.sequence(0, reviewsPage.totalPages - 1)}"
+                                    th:classappend="${i == reviewsPage.number ? 'active' : ''}">
+                                    <a class="page-link"
+                                        th:href="@{/admin/reviews(page=${i}, status=${status}, minRating=${minRating}, maxRating=${maxRating}, searchTerm=${searchTerm})}"
+                                        th:text="${i + 1}">1</a>
+                                </li>
+
+                                <li class="page-item" th:classappend="${reviewsPage.last ? 'disabled' : ''}">
+                                    <a class="page-link"
+                                        th:href="@{/admin/reviews(page=${reviewsPage.number + 1}, status=${status}, minRating=${minRating}, maxRating=${maxRating}, searchTerm=${searchTerm})}"
+                                        aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            console.log('DOM ready - 관리자 리뷰 페이지 스크립트 초기화');
+
+            // 디버깅용 - 현재 URL 파라미터 확인
+            const urlParams = new URLSearchParams(window.location.search);
+            console.log('현재 URL 파라미터:', {
+                status: urlParams.get('status'),
+                minRating: urlParams.get('minRating'),
+                maxRating: urlParams.get('maxRating'),
+                searchTerm: urlParams.get('searchTerm'),
+                page: urlParams.get('page')
+            });
+
+            // 평점 필터 이벤트
+            $('.filter-btn-rating').click(function (e) {
+                e.preventDefault();
+                const rating = $(this).data('rating');
+                console.log('평점 필터 클릭:', rating);
+
+                // 모든 필터 버튼에서 active 클래스 제거
+                $('.filter-btn-rating').removeClass('active');
+                // 클릭한 버튼에 active 클래스 추가
+                $(this).addClass('active');
+
+                // 평점 필터 적용
+                if (rating === 'all') {
+                    // 전체 평점인 경우 필터 제거
+                    console.log('전체 평점 필터 적용');
+                    updateFilter('minRating', null);
+                    updateFilter('maxRating', null);
+                } else {
+                    // 특정 평점인 경우 min, max 동일하게 설정
+                    const ratingValue = parseInt(rating);
+                    console.log('평점 필터 적용:', ratingValue);
+                    updateFilter('minRating', ratingValue);
+                    updateFilter('maxRating', ratingValue);
+                }
+
+                // 페이지 초기화
+                updateFilter('page', 0);
+
+                // 폼 로깅 및 제출
+                logFormData();
+                $('#searchForm').submit();
+            });
+
+            // 폼 데이터 로깅 함수
+            function logFormData() {
+                const form = $('#searchForm');
+                console.log('폼 제출 데이터:');
+
+                // hidden 입력 필드 확인
+                form.find('input[type="hidden"]').each(function () {
+                    console.log(`${$(this).attr('name')}: ${$(this).val()}`);
+                });
+
+                // 검색어 필드 확인
+                console.log(`searchTerm: ${form.find('input[name="searchTerm"]').val()}`);
+            }
+
+            // 정렬 방식 변경 이벤트
+            $('#sortSelect').change(function () {
+                const sortValue = $(this).val();
+                console.log('정렬 방식 변경:', sortValue);
+                let sort = '';
+
+                switch (sortValue) {
+                    case 'newest':
+                        sort = 'createdAt,desc';
+                        break;
+                    case 'oldest':
+                        sort = 'createdAt,asc';
+                        break;
+                    case 'highRating':
+                        sort = 'rating,desc';
+                        break;
+                    case 'lowRating':
+                        sort = 'rating,asc';
+                        break;
+                }
+
+                updateFilter('sort', sort);
+                logFormData();
+                $('#searchForm').submit();
+            });
+
+            // 필터 업데이트 및 페이지 새로고침
+            function updateFilter(paramName, paramValue) {
+                const form = $('#searchForm');
+                console.log(`필터 업데이트: ${paramName} = ${paramValue}`);
+
+                // 기존 hidden input 확인
+                let input = form.find(`input[name="${paramName}"]`);
+
+                // 없으면 새로 생성
+                if (input.length === 0) {
+                    console.log(`새 hidden 입력 필드 생성: ${paramName}`);
+                    form.append(`<input type="hidden" name="${paramName}" value="${paramValue !== null ? paramValue : ''}">`);
+                } else {
+                    // 있으면 값 업데이트
+                    console.log(`기존 hidden 입력 필드 업데이트: ${paramName}`);
+                    input.val(paramValue !== null ? paramValue : '');
+                }
+            }
+
+            // 페이지 로드 시 URL 파라미터에 따라 필터 UI 상태 설정
+            function initializeFiltersFromUrl() {
+                const urlParams = new URLSearchParams(window.location.search);
+                console.log('필터 초기화 시작');
+
+                // 정렬 방식 설정
+                const sort = urlParams.get('sort');
+                if (sort) {
+                    let sortValue = 'newest'; // 기본값
+
+                    if (sort === 'createdAt,asc') sortValue = 'oldest';
+                    else if (sort === 'rating,desc') sortValue = 'highRating';
+                    else if (sort === 'rating,asc') sortValue = 'lowRating';
+
+                    console.log('정렬 초기화:', sortValue);
+                    $('#sortSelect').val(sortValue);
+                }
+
+                // 평점 필터 상태 업데이트
+                const minRating = urlParams.get('minRating');
+                const maxRating = urlParams.get('maxRating');
+
+                console.log('평점 필터 초기화:', { minRating, maxRating });
+
+                if (minRating === maxRating && minRating !== null) {
+                    console.log(`특정 평점 필터 활성화: ${minRating}`);
+                    $(`.filter-btn-rating[data-rating="${minRating}"]`).addClass('active');
+                    $('.filter-btn-rating[data-rating="all"]').removeClass('active');
+                } else {
+                    console.log('전체 평점 필터 활성화');
+                    $('.filter-btn-rating[data-rating="all"]').addClass('active');
+                    $('.filter-btn-rating[data-rating]').not('[data-rating="all"]').removeClass('active');
+                }
+            }
+
+            // 필터 초기화 함수 호출
+            initializeFiltersFromUrl();
+
+            // 디버깅용 - 각 필터 버튼의 data-rating 값 확인
+            console.log('평점 필터 버튼 확인:');
+            $('.filter-btn-rating').each(function () {
+                console.log(`- 버튼: ${$(this).text().trim()}, data-rating: ${$(this).data('rating')}`);
+            });
+        });
+
+        // 리뷰 삭제 확인
+        function confirmDeleteReview(reviewId) {
+            if (confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
+                window.location.href = '/admin/reviews/delete/' + reviewId;
+            }
+        }
+    </script>
+</body>
+
+</html>

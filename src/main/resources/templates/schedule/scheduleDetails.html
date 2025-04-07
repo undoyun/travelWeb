@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ワクワク:여행 일정 상세</title>
+    <!-- 아이콘용(폰트어썸) CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/schedule/scheduleDetails.css}">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/schedule/scheduleDetailsMap.css}">
+
+</head>
+
+<body>
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <div class="main-container">
+        <!-- 뒤로가기 링크 -->
+        <a href="/schedule/schedules" class="back-link">
+            <i class="fas fa-arrow-left"></i> 일정 목록으로 돌아가기
+        </a>
+
+        <!-- 여행 상세 카드 -->
+        <div class="detail-card">
+            <!-- 여행 이미지 배너 -->
+            <div class="trip-banner"
+                th:style="${scheduleItem.planPhoto != null && !scheduleItem.planPhoto.isEmpty()} ? |background-image: url('${scheduleItem.planPhoto}')| : |background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop')|">
+                <div class="banner-overlay">
+                    <h1 class="trip-title" th:text="${scheduleItem.planName}">여행 계획 이름</h1>
+                    <div class="trip-dates">
+                        <i class="far fa-calendar-alt"></i>
+                        <span th:text="${scheduleItem.startDate} + ' ~ ' + ${scheduleItem.endDate}">2024-02-04 ~
+                            2024-02-08</span>
+                    </div>
+                    <button id="reviewBtn" class="review-button">
+                        <i class="fas fa-star"></i> 리뷰 작성
+                    </button>
+                </div>
+            </div>
+
+            <!-- 여행 정보 섹션 -->
+            <div class="card-header">
+                <i class="fas fa-info-circle"></i> 여행 정보
+            </div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-plane-departure"></i> 출발지
+                        </div>
+                        <div class="info-value" th:text="${scheduleItem.departLocation}">서울</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-plane-arrival"></i> 목적지
+                        </div>
+                        <div class="info-value" th:text="${scheduleItem.destination}">후쿠오카</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-tag"></i> 여행 목적
+                        </div>
+                        <div class="info-value" th:text="${scheduleItem.purpose}">관광</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-plane"></i> 교통 수단
+                        </div>
+                        <div class="info-value" th:text="${scheduleItem.transportation}">비행기</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-wallet"></i> 예산
+                        </div>
+                        <div class="info-value" th:text="${scheduleItem.budget} + '원'">500,000원</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-tachometer-alt"></i> 여행 밀도
+                        </div>
+                        <div class="info-value" th:text="${scheduleItem.density}">적당히</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-hotel"></i> 숙소 위치
+                        </div>
+                        <div class="info-value" th:text="${scheduleItem.hotelLocation}">텐진역 근처</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">
+                            <i class="fas fa-bus"></i> 이동 방식
+                        </div>
+                        <div class="info-value" th:text="${scheduleItem.travelMode}">대중교통</div>
+                    </div>
+                </div>
+
+                <div class="trip-description"
+                    th:if="${scheduleItem.planDescription != null && !scheduleItem.planDescription.isEmpty()}">
+                    <p th:text="${scheduleItem.planDescription}">여행 설명 내용이 여기에 표시됩니다.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 새로운 분할 레이아웃: 지도 + 일정 -->
+        <div class="split-layout">
+            <!-- 왼쪽: 지도 섹션 -->
+            <div class="map-section">
+                <div class="sticky-map">
+                    <div id="map" style="width:100%;height:450px;"></div>
+
+                    <!-- 지도 컨트롤 패널 -->
+                    <div class="map-controls">
+                        <button id="routeButton" class="map-btn">
+                            <i class="fas fa-route"></i> 경로 보기
+                        </button>
+                        <button id="fitBoundsButton" class="map-btn">
+                            <i class="fas fa-expand-arrows-alt"></i> 전체 보기
+                        </button>
+                    </div>
+
+                    <!-- 지도 로딩 오버레이 -->
+                    <div class="map-loading" id="mapLoading">
+                        <i class="fas fa-spinner"></i>
+                    </div>
+
+                    <!-- 줌 컨트롤 -->
+                    <div class="zoom-control">
+                        <button class="zoom-btn" id="zoomIn"><i class="fas fa-plus"></i></button>
+                        <button class="zoom-btn" id="zoomOut"><i class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 오른쪽: 일정 섹션 -->
+            <div class="itinerary-section">
+                <!-- 날짜 탭 -->
+                <div class="day-tabs" id="dayTabs">
+                    <!-- 날짜 탭은 JavaScript로 동적 생성 -->
+                </div>
+
+                <!-- 일정 내용 -->
+                <div class="itinerary-card">
+                    <div class="current-day-title">
+                        <h3>Day 1</h3>
+                        <span class="date">2024-10-10</span>
+                    </div>
+                    <div id="itineraryContainer" class="itinerary-content">
+                        <!-- 로딩 스피너 -->
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 버튼 섹션 -->
+        <div class="button-container">
+            <a th:href="@{/schedule/edit/{id}(id=${scheduleItem.id})}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> 일정 수정
+            </a>
+            <button class="btn btn-danger" id="btnDeleteSchedule">
+                <i class="fas fa-trash-alt"></i> 일정 삭제
+            </button>
+        </div>
+    </div>
+
+    <!-- 일정 JSON 데이터 (hidden) -->
+    <div id="scheduleJsonData" style="display: none;" th:text="${scheduleItem.scheduleJson}"></div>
+
+    <!-- 삭제 확인 모달 -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    일정 삭제
+                </h2>
+                <span class="close" id="closeDeleteModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>정말로 이 일정을 삭제하시겠습니까?</p>
+                <p class="warning-text">
+                    <i class="fas fa-exclamation-circle"></i>
+                    이 작업은 되돌릴 수 없습니다
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnCancelDelete">
+                    <i class="fas fa-times"></i>
+                    취소
+                </button>
+                <form th:action="@{/schedule/delete/{id}(id=${scheduleItem.id})}" method="post"
+                    style="display: inline;">
+                    <button type="submit" class="btn btn-danger" id="btnConfirmDelete">
+                        <i class="fas fa-trash-alt"></i>
+                        삭제
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 리뷰 작성 모달 -->
+    <div id="reviewModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">여행 리뷰 작성</h2>
+                <span class="close">&times;</span>
+            </div>
+
+            <div id="reviewAlert" class="alert">
+                이미 이 여행에 대한 리뷰를 작성하셨습니다.
+            </div>
+
+            <form id="reviewForm" th:action="@{/reviews/save}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="scheduleId" th:value="${scheduleItem.id}">
+                <input type="hidden" name="destination" th:value="${scheduleItem.destination}">
+
+                <div class="form-group">
+                    <label for="title">리뷰 제목</label>
+                    <input type="text" class="form-control" id="title" name="title" placeholder="리뷰 제목을 입력하세요" required>
+                </div>
+
+                <div class="rating-container">
+                    <span class="rating-label">평점</span>
+                    <div class="stars">
+                        <i class="fas fa-star star" data-rating="1"></i>
+                        <i class="fas fa-star star" data-rating="2"></i>
+                        <i class="fas fa-star star" data-rating="3"></i>
+                        <i class="fas fa-star star" data-rating="4"></i>
+                        <i class="fas fa-star star" data-rating="5"></i>
+                    </div>
+                    <input type="hidden" name="rating" id="rating" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="content">리뷰 내용</label>
+                    <textarea class="form-control" id="content" name="content" placeholder="여행 경험에 대한 솔직한 리뷰를 작성해주세요."
+                        required></textarea>
+                </div>
+
+                <div class="image-upload">
+                    <label>사진 첨부</label>
+                    <p style="font-size: 0.9rem; color: #666; margin-bottom: 10px;">최대 3장까지 업로드 가능합니다.</p>
+                    <label for="photos" class="custom-file-upload">
+                        <i class="fas fa-camera"></i> 사진 선택
+                    </label>
+                    <input type="file" id="photos" name="photos" accept="image/*" multiple>
+
+                    <div class="image-preview" id="imagePreview">
+                        <!-- 이미지 미리보기가 여기에 표시됩니다 -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tags">태그</label>
+                    <input type="text" class="form-control" id="tags" name="tags"
+                        placeholder="쉼표로 구분하여 태그를 입력하세요 (예: 가성비,힐링,맛집)">
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-cancel" id="cancelBtn">취소</button>
+                    <button type="submit" class="btn btn-submit">리뷰 등록</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Kakao Maps API (appkey는 본인의 JavaScript 키로 교체) -->
+    <script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=941282e8b7c94ddf03067d4aca6b05f0&libraries=services">
+        </script>
+    <script th:src="@{/js/schedule/myPagedetailsMap.js}"></script>
+    <script th:src="@{/js/main/nav.js}"></script>
+    <script th:src="@{/js/schedule/modal.js}"></script>
+    <script th:src="@{/js/schedule/scheduleDelete.js}"></script>
+</body>
+
+</html>

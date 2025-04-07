@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ワクワク: 자주 묻는 질문</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+    <style>
+        /* FAQ 페이지 스타일 */
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .faq-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 검색 영역 스타일 */
+        .search-container {
+            margin-top: 90px;
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 50px 15px 20px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        /* 카테고리 탭 스타일 */
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            margin: 30px 0;
+            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
+        }
+
+        .category-tabs::-webkit-scrollbar {
+            display: none;
+            /* Chrome, Safari, Opera */
+        }
+
+        .category-tab {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            text-align: center;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+            border-radius: 30px;
+            background-color: transparent;
+            border: none;
+        }
+
+        .category-tab:hover {
+            color: #0080c6;
+        }
+
+        .category-tab.active {
+            background-color: #0080c6;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* FAQ 콘텐츠 스타일 */
+        .faq-list {
+            margin-top: 40px;
+        }
+
+        .faq-item {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #fff;
+            cursor: pointer;
+            /* 높이를 고정시키기 위한 설정 */
+            min-height: 72px;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background-color: #f8f9fa;
+        }
+
+        .faq-question h3 {
+            font-size: 17px;
+            font-weight: 500;
+            margin: 0;
+            flex: 1;
+            padding-right: 20px;
+        }
+
+        .faq-icon {
+            font-size: 18px;
+            color: #0080c6;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 20px;
+            background-color: #f8f9fa;
+            transition: max-height 0.5s ease, padding 0.5s ease;
+        }
+
+        .faq-answer p {
+            margin: 0;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #495057;
+            padding-bottom: 20px;
+        }
+
+        .active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .active .faq-answer {
+            max-height: 500px;
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="무엇을 도와드릴까요?" aria-label="검색어 입력">
+            <span class="search-icon"><i class="fas fa-search"></i></span>
+        </div>
+    </div>
+
+    <div class="category-tabs">
+        <button class="category-tab active" data-category="all">전체</button>
+        <button class="category-tab" data-category="travel">여행</button>
+        <button class="category-tab" data-category="service">서비스</button>
+        <button class="category-tab" data-category="account">회원정보</button>
+    </div>
+
+    <div class="faq-container">
+        <div class="faq-list">
+            <!-- 여행 카테고리 -->
+            <div class="faq-item" data-category="travel">
+                <div class="faq-question">
+                    <h3>부산에서 꼭 가봐야 할 명소는 어디인가요?</h3>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>부산에서는 해운대 해수욕장, 광안리 해변, 감천문화마을, 태종대, 자갈치 시장 등이 인기 있는 명소입니다. 계절별로 다양한 축제와 이벤트도 있으니 방문 전 확인해보시는 것을
+                        추천드립니다.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="travel">
+                <div class="faq-question">
+                    <h3>부산의 대중교통을 이용하는 방법은 무엇인가요?</h3>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>부산의 대중교통은 지하철, 버스, 택시를 이용할 수 있습니다. 교통카드(T-money, 캐시비)를 구매하여 충전 후 이용하는 것이 편리합니다. 부산시티투어버스를 이용하면 주요
+                        관광지를 편리하게 둘러볼 수 있습니다.</p>
+                </div>
+            </div>
+
+            <!-- 서비스 카테고리 -->
+            <div class="faq-item" data-category="service">
+                <div class="faq-question">
+                    <h3>여행 일정을 어떻게 계획할 수 있나요?</h3>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>저희 서비스의 '일정 만들기' 기능을 이용하시면 손쉽게 여행 일정을 계획하실 수 있습니다. 추천 명소를 선택하거나 직접 장소를 검색하여 일정에 추가할 수 있으며, AI 추천
+                        기능을 통해 맞춤형 일정도 받아보실 수 있습니다.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="service">
+                <div class="faq-question">
+                    <h3>AI 추천 기능은 어떻게 사용하나요?</h3>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>AI 추천 기능은 '일정 만들기' 페이지에서 '여행 스타일', '방문 기간', '선호하는 활동' 등을 입력하시면 AI가 분석하여 맞춤형 일정을 추천해드립니다. 생성된 일정은
+                        자유롭게 수정하실 수 있습니다.</p>
+                </div>
+            </div>
+
+            <!-- 계정 카테고리 -->
+            <div class="faq-item" data-category="account">
+                <div class="faq-question">
+                    <h3>비밀번호를 잊어버렸을 때 어떻게 해야 하나요?</h3>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>로그인 페이지에서 '비밀번호 찾기' 버튼을 클릭하신 후, 가입 시 등록한 이메일 주소를 입력하시면 비밀번호 재설정 링크가 포함된 이메일을 받으실 수 있습니다. 해당 링크를
+                        통해 새로운 비밀번호를 설정하시면 됩니다.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="account">
+                <div class="faq-question">
+                    <h3>회원 탈퇴는 어떻게 하나요?</h3>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>로그인 후 '마이페이지 > 계정 설정'에서 페이지 하단의 '회원 탈퇴' 버튼을 클릭하시면 탈퇴 절차를 진행하실 수 있습니다. 탈퇴 시 모든 개인정보와 저장된 일정이 삭제되니
+                        신중하게 결정해 주세요.</p>
+                </div>
+            </div>
+
+            <!-- 기타 카테고리 -->
+            <div class="faq-item" data-category="etc">
+                <div class="faq-question">
+                    <h3>서비스 이용 중 오류가 발생하면 어떻게 해야 하나요?</h3>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>서비스 이용 중 오류가 발생하면 '마이페이지 > 1:1문의'를 통해 문제 상황을 알려주시기 바랍니다. 가능한 빠르게 확인 후 해결해 드리겠습니다. 긴급한 문의는 고객센터
+                        전화(051-123-4567)로 연락 주시기 바랍니다.</p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-category="etc">
+                <div class="faq-question">
+                    <h3>해외에서도 서비스를 이용할 수 있나요?</h3>
+                    <i class="fas fa-chevron-down faq-icon"></i>
+                </div>
+                <div class="faq-answer">
+                    <p>현재 서비스는 부산에서만 이용 가능합니다. 추후 서비스 지역 확대를 검토하고 있습니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // FAQ 아코디언 기능
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                // 클릭한 질문의 부모 요소(faq-item)에 active 클래스 토글
+                const item = question.parentElement;
+                item.classList.toggle('active');
+
+                // 다른 열린 항목 닫기 (한 번에 하나만 열리게 하려면 주석 해제)
+                /*
+                document.querySelectorAll('.faq-item').forEach(otherItem => {
+                    if (otherItem !== item && otherItem.classList.contains('active')) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+                */
+            });
+        });
+
+        // 카테고리 탭 기능
+        document.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 모든 탭에서 active 클래스 제거
+                document.querySelectorAll('.category-tab').forEach(t => {
+                    t.classList.remove('active');
+                });
+
+                // 클릭한 탭에 active 클래스 추가
+                tab.classList.add('active');
+
+                // 선택한 카테고리 가져오기
+                const category = tab.getAttribute('data-category');
+                console.log('선택한 카테고리:', category); // 디버깅용
+
+                // 카테고리에 따라 FAQ 항목 필터링
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    if (category === 'all' || item.getAttribute('data-category') === category) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // 검색 기능
+        document.querySelector('.search-input').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                const searchTerm = e.target.value.toLowerCase();
+
+                // 검색어에 따라 FAQ 항목 필터링
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    const questionText = item.querySelector('.faq-question h3').textContent.toLowerCase();
+                    const answerText = item.querySelector('.faq-answer p').textContent.toLowerCase();
+
+                    if (questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            }
+        });
+
+        // 검색 아이콘 클릭 이벤트
+        document.querySelector('.search-icon').addEventListener('click', () => {
+            const searchTerm = document.querySelector('.search-input').value.toLowerCase();
+
+            // 검색어에 따라 FAQ 항목 필터링
+            document.querySelectorAll('.faq-item').forEach(item => {
+                const questionText = item.querySelector('.faq-question h3').textContent.toLowerCase();
+                const answerText = item.querySelector('.faq-answer p').textContent.toLowerCase();
+
+                if (questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    <script th:src="@{/js/main/nav.js}"></script>
+</body>
+
+</html>

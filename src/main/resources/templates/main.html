@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ワクワク - 부산 여행 일정 관리</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <link rel="stylesheet" th:href="@{/css/main/calendar.css}">
+    <link rel="stylesheet" th:href="@{/css/main/modal.css}">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/main/weather.css}">
+    <!-- 카카오맵 API 추가 -->
+    <script type="text/javascript"
+        src="//dapi.kakao.com/v2/maps/sdk.js?appkey=46e0a2dac4ec1a25c1bb0bc792417bd2&libraries=services"></script>
+</head>
+
+<body>
+    <!-- 네비게이션 바 -->
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <!-- 환영 배너 섹션 -->
+    <div class="welcome-banner">
+        <div class="banner-slider">
+            <!-- 슬라이드 1: 해운대 해수욕장 (유지) -->
+            <div class="banner-slide active">
+                <div class="banner-content">
+                    <h1>해운대 해수욕장, 부산의 상징적인 해변에서의 여름</h1>
+                    <div class="banner-pagination">
+                        <span class="current">1</span> / <span class="total">4</span>
+                        <div class="pagination-controls">
+                            <button class="prev-slide"><i class="fas fa-chevron-left"></i></button>
+                            <button class="pause-slide"><i class="fas fa-pause"></i></button>
+                            <button class="next-slide"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 슬라이드 2: 오륙도 스카이워크 -->
+            <div class="banner-slide">
+                <div class="banner-content">
+                    <h1>오륙도 스카이워크, 바다 위를 걷는 짜릿한 경험</h1>
+                    <div class="banner-pagination">
+                        <span class="current">2</span> / <span class="total">4</span>
+                        <div class="pagination-controls">
+                            <button class="prev-slide"><i class="fas fa-chevron-left"></i></button>
+                            <button class="pause-slide"><i class="fas fa-pause"></i></button>
+                            <button class="next-slide"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 슬라이드 3: 송도 해상 케이블카 -->
+            <div class="banner-slide">
+                <div class="banner-content">
+                    <h1>송도 해상 케이블카, 바다 위에서 즐기는 부산의 절경</h1>
+                    <div class="banner-pagination">
+                        <span class="current">3</span> / <span class="total">4</span>
+                        <div class="pagination-controls">
+                            <button class="prev-slide"><i class="fas fa-chevron-left"></i></button>
+                            <button class="pause-slide"><i class="fas fa-pause"></i></button>
+                            <button class="next-slide"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 슬라이드 4: 동래읍성 (자갈치 시장 대신) -->
+            <div class="banner-slide">
+                <div class="banner-content">
+                    <h1>동래읍성, 조선 시대의 흔적을 따라가는 역사 여행</h1>
+                    <div class="banner-pagination">
+                        <span class="current">4</span> / <span class="total">4</span>
+                        <div class="pagination-controls">
+                            <button class="prev-slide"><i class="fas fa-chevron-left"></i></button>
+                            <button class="pause-slide"><i class="fas fa-pause"></i></button>
+                            <button class="next-slide"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 메인 컨테이너 -->
+    <div class="main-container">
+        <!-- 왼쪽 사이드 패널 -->
+        <div class="side-panel">
+            <!-- 핵심 지표 섹션 -->
+            <div class="stats-section">
+                <h3><i class="fas fa-chart-simple"></i> 여행 통계</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-plane"></i></div>
+                        <div class="stat-info">
+                            <h4>총 여행</h4>
+                            <p th:text="${totalTrips != null ? totalTrips : '0'}">5</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                        <div class="stat-info">
+                            <h4>다가오는 여행</h4>
+                            <p th:text="${upcomingTrips != null ? upcomingTrips : '0'}">2</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-location-dot"></i></div>
+                        <div class="stat-info">
+                            <h4>방문 장소</h4>
+                            <p th:text="${visitedPlaces != null ? visitedPlaces : '0'}">12</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div class="stat-info">
+                            <h4>다음 여행까지</h4>
+                            <p>
+                                <span th:if="${daysToNextTrip != null}" th:text="${daysToNextTrip + '일'}">3일</span>
+                                <span th:unless="${daysToNextTrip != null}" class="no-plan">계획 없음</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 다가오는 여행 리스트 -->
+            <div class="upcoming-trips">
+                <h3><i class="fas fa-plane-departure"></i> 다가오는 여행</h3>
+                <div class="trips-container">
+                    <!-- 여행이 없을 경우 -->
+                    <div th:if="${#lists.isEmpty(upcomingTripsList)}" class="empty-trips">
+                        <p>예정된 여행이 없습니다</p>
+                        <a href="/itineraries/ItineraryCreate" class="create-trip-btn">새 여행 계획하기</a>
+                    </div>
+
+                    <!-- 여행이 있을 경우 -->
+                    <div th:unless="${#lists.isEmpty(upcomingTripsList)}" class="trip-cards">
+                        <div th:each="trip : ${upcomingTripsList}" class="trip-card">
+                            <div class="trip-date">
+                                <span class="date-number" th:text="${#strings.substring(trip.startDate, 8, 10)}">15</span>
+                                <span class="date-month" th:text="${#strings.substring(trip.startDate, 5, 7) + '월'}">6월</span>
+                            </div>
+                            <div class="trip-info">
+                                <h4 th:text="${trip.title}">제주도 여행</h4>
+                                <p>
+                                    <i class="fas fa-clock"></i>
+                                    <span th:text="${trip.daysUntil + '일 남음'}">3일 남음</span>
+                                </p>
+                                <p>
+                                    <i class="fas fa-calendar-day"></i>
+                                    <span th:text="${trip.duration + '일간'}">5일간</span>
+                                </p>
+                            </div>
+                            <a th:href="@{'/itineraries/' + ${trip.id}}" class="trip-view-btn">
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 종료된 여행 리스트 -->
+            <div class="completed-trips">
+                <h3><i class="fas fa-plane-arrival"></i> 종료된 여행</h3>
+                <div class="trips-container">
+                    <!-- 종료된 여행이 없을 경우 -->
+                    <div th:if="${#lists.isEmpty(completedTripsList)}" class="empty-trips">
+                        <p>종료된 여행이 없습니다</p>
+                    </div>
+
+                    <!-- 종료된 여행이 있을 경우 -->
+                    <div th:unless="${#lists.isEmpty(completedTripsList)}" class="trip-cards">
+                        <div th:each="trip : ${completedTripsList}" class="trip-card">
+                            <div class="trip-date">
+                                <span class="date-number" th:text="${#strings.substring(trip.endDate, 8, 10)}">15</span>
+                                <span class="date-month" th:text="${#strings.substring(trip.endDate, 5, 7) + '월'}">6월</span>
+                            </div>
+                            <div class="trip-info">
+                                <h4 th:text="${trip.title}">제주도 여행</h4>
+                                <p>
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>여행 완료</span>
+                                </p>
+                                <p th:if="${trip.hasReview}" class="has-review">
+                                    <i class="fas fa-star"></i>
+                                    <span>리뷰 작성됨</span>
+                                </p>
+                                <p th:unless="${trip.hasReview}" class="no-review">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <span>리뷰 미작성</span>
+                                </p>
+                            </div>
+                            <a th:href="@{'/schedule/scheduleDetails/' + ${trip.id}}" class="trip-view-btn">
+                                <i class="fas fa-pencil-alt" th:if="${!trip.hasReview}"></i>
+                                <i class="fas fa-arrow-right" th:if="${trip.hasReview}"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 추천 여행 정보 -->
+            <div class="recommendations">
+                <h3><i class="fas fa-star"></i> 부산의 매력적인 구/군</h3>
+                <div class="recommendation-cards">
+                    <div class="recommendation-card">
+                        <img th:src="@{/img/itineraries/haeundae.jpeg}" alt="해운대구">
+                        <div class="recommendation-info">
+                            <h4>해운대구</h4>
+                            <p>해운대 해수욕장, 동백섬, 마린시티 등 부산의 대표 관광지</p>
+                            <a href="/attractions/gugun/해운대구" class="view-more">자세히 보기 <i
+                                    class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                    <div class="recommendation-card">
+                        <img th:src="@{/img/itineraries/jung.jpeg}" alt="중구">
+                        <div class="recommendation-info">
+                            <h4>중구</h4>
+                            <p>국제시장, 자갈치시장, 용두산공원 등 부산의 역사와 문화</p>
+                            <a href="/attractions/gugun/중구" class="view-more">자세히 보기 <i
+                                    class="fas fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 오른쪽 캘린더 영역 -->
+        <div id="calendar-container">
+            <div class="calendar-header">
+                <h2>여행 일정</h2>
+                <div class="calendar-actions">
+                    <button class="btn-create-event" onclick="window.location.href='/itineraries/itineraryMain'"><i
+                            class="fas fa-plus"></i> 새 일정</button>
+                    <button class="btn-today">오늘</button>
+                </div>
+            </div>
+
+            <!-- 뷰 선택 탭 추가 -->
+            <div class="view-selector">
+                <button class="view-btn active" data-view="dayGridMonth">월</button>
+                <button class="view-btn" data-view="timeGridWeek">주</button>
+                <button class="view-btn" data-view="timeGridDay">일</button>
+            </div>
+
+            <div id="calendar"></div>
+
+            <!-- 실시간 날씨 위젯 -->
+            <div class="weather-widget">
+                <div id="weather-info">
+                    <div class="weather-loading">
+                        <i class="fas fa-spinner fa-spin"></i> 날씨 정보를 불러오는 중...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer class="main-footer">
+        <div class="footer-container">
+            <div class="footer-logo">
+                <h3>ワクワク</h3>
+                <p>부산 여행의 즐거움을 더하는 일정 관리 서비스</p>
+            </div>
+            <div class="footer-links">
+                <div class="footer-section">
+                    <h4>서비스</h4>
+                    <ul>
+                        <li><a href="/about">서비스 소개</a></li>
+                        <li><a href="/faq">자주 묻는 질문</a></li>
+                        <li><a href="/contact">문의하기</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>정책</h4>
+                    <ul>
+                        <li><a href="/terms">이용약관</a></li>
+                        <li><a href="/privacy">개인정보처리방침</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>소셜 미디어</h4>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 ワクワク. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- 일정 수정 모달 -->
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">여행 일정 정보</h2>
+
+            <!-- 일정 정보 표시 영역 (읽기 모드) -->
+            <div id="eventInfoView" class="event-info">
+                <div class="event-info-item">
+                    <div class="event-info-icon"><i class="fas fa-map-marker-alt"></i></div>
+                    <div class="event-info-content">
+                        <div class="event-info-label">여행 이름</div>
+                        <div class="event-info-value" id="eventTitleView"></div>
+                    </div>
+                </div>
+                <div class="event-info-item">
+                    <div class="event-info-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <div class="event-info-content">
+                        <div class="event-info-label">여행 기간</div>
+                        <div class="event-info-value" id="eventDateView"></div>
+                    </div>
+                </div>
+                <div class="event-info-item">
+                    <div class="event-info-icon"><i class="fas fa-align-left"></i></div>
+                    <div class="event-info-content">
+                        <div class="event-info-label">여행 설명</div>
+                        <div class="event-info-value" id="eventDescriptionView"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 일정 수정 폼 (수정 모드) -->
+            <div id="eventEditForm" style="display: none;">
+                <div class="form-group">
+                    <label for="eventTitle"><i class="fas fa-heading"></i> 여행 이름</label>
+                    <input type="text" id="eventTitle" placeholder="여행 이름을 입력하세요">
+                </div>
+
+                <div class="form-group">
+                    <label for="eventCategory"><i class="fas fa-palette"></i> 일정 색상</label>
+                    <select id="eventCategory">
+                        <option value="1">파란색 (기본)</option>
+                        <option value="2">빨간색</option>
+                        <option value="3">초록색</option>
+                        <option value="4">보라색</option>
+                        <option value="5">주황색</option>
+                    </select>
+                    <div class="category-preview">
+                        <div class="color-preview color-preview-1" data-category="1"></div>
+                        <div class="color-preview color-preview-2" data-category="2"></div>
+                        <div class="color-preview color-preview-3" data-category="3"></div>
+                        <div class="color-preview color-preview-4" data-category="4"></div>
+                        <div class="color-preview color-preview-5" data-category="5"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="eventDescription"><i class="fas fa-align-left"></i> 여행 설명</label>
+                    <textarea id="eventDescription" placeholder="여행에 대한 설명을 입력하세요"></textarea>
+                </div>
+
+                <!-- 일정 수정 폼에 추가 -->
+                <input type="hidden" id="eventId" name="eventId">
+            </div>
+
+            <div class="modal-buttons">
+                <button id="editEvent"><i class="fas fa-edit"></i> 수정</button>
+                <button id="saveEvent" style="display: none;"><i class="fas fa-save"></i> 저장</button>
+                <button id="deleteEvent"><i class="fas fa-trash-alt"></i> 삭제</button>
+                <button id="cancelEvent"><i class="fas fa-times"></i> 취소</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    <script th:src="@{/js/main/main.js}"></script>
+    <script th:src="@{/js/main/calendar.js}"></script>
+    <script th:src="@{/js/main/modal.js}"></script>
+    <script th:src="@{/js/main/nav.js}"></script>
+    <script th:src="@{/js/main/weather.js}"></script>
+</body>
+
+</html>

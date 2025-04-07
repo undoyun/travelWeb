@@ -1,0 +1,394 @@
+/* ✅ 모달 전체 스타일 */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 90, 140, 0.6);
+    backdrop-filter: blur(5px);
+    overflow-y: auto;
+}
+
+/* ✅ 모달 컨텐츠 박스 */
+.modal-content {
+    width: 450px;
+    max-width: 90%;
+    padding: 35px;
+    margin: 80px auto;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    animation: modalFadeIn 0.5s forwards;
+    background-color: white;
+    border-top: 5px solid #0080c6;
+}
+
+/* 배경 이미지 위에 오버레이 추가 */
+.modal-content:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+    z-index: -1;
+}
+
+/* 부산 테마 장식 요소 */
+.modal-content::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    width: 150px;
+    height: 150px;
+    background-color: rgba(0, 128, 198, 0.05);
+    border-radius: 50%;
+    z-index: -1;
+}
+
+/* ✅ 모달 닫기 버튼 */
+.close {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #adb5bd;
+    transition: all 0.3s ease;
+    z-index: 10;
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+    text-align: center;
+    border-radius: 50%;
+}
+
+.close:hover {
+    color: #0080c6;
+    background-color: #e6f4ff;
+}
+
+/* ✅ 모달 제목 */
+.modal h2 {
+    margin-bottom: 30px;
+    color: #343a40;
+    font-size: 24px;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+}
+
+.modal h2:after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background: #0080c6;
+    border-radius: 3px;
+}
+
+/* ✅ 폼 그룹 스타일 */
+.form-group {
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+    color: #343a40;
+    font-size: 15px;
+}
+
+.form-group label i {
+    color: #0080c6;
+    margin-right: 6px;
+}
+
+/* ✅ 입력 필드 스타일 */
+.modal input[type="text"],
+.modal input[type="date"],
+.modal textarea,
+.modal select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #dee2e6;
+    border-radius: 30px;
+    font-size: 15px;
+    background-color: #f8f9fa;
+    transition: all 0.3s ease;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #343a40;
+}
+
+/* ✅ 여행 설명(textarea) 스타일 조정 */
+.modal textarea {
+    height: 120px;
+    resize: none;
+    line-height: 1.5;
+    border-radius: 20px;
+}
+
+/* ✅ 입력 필드 포커스 효과 */
+.modal input[type="text"]:focus,
+.modal input[type="date"]:focus,
+.modal textarea:focus,
+.modal select:focus {
+    outline: none;
+    border-color: #0080c6;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(0, 128, 198, 0.1);
+}
+
+.modal input[type="text"]::placeholder,
+.modal textarea::placeholder {
+    color: #adb5bd;
+}
+
+/* 카테고리 선택 스타일 */
+.modal select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230080c6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+/* 카테고리 색상 미리보기 */
+.category-preview {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.color-preview {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.color-preview:hover, .color-preview.active {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 2px white, 0 0 0 4px rgba(0, 128, 198, 0.3);
+}
+
+.color-preview-1 {
+    background-color: #0080c6;
+}
+
+.color-preview-2 {
+    background-color: #FF6B6B;
+}
+
+.color-preview-3 {
+    background-color: #20c997;
+}
+
+.color-preview-4 {
+    background-color: #845ef7;
+}
+
+.color-preview-5 {
+    background-color: #ff922b;
+}
+
+/* ✅ 버튼 스타일 */
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 30px;
+}
+
+.modal-buttons button {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    font-family: 'Noto Sans KR', sans-serif;
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.modal-buttons button i {
+    font-size: 16px;
+}
+
+#editEvent,
+#saveEvent,
+#saveNewEvent {
+    background-color: #0080c6;
+    color: white;
+}
+
+#editEvent:hover,
+#saveEvent:hover,
+#saveNewEvent:hover {
+    background-color: #005a8c;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 128, 198, 0.2);
+}
+
+#deleteEvent {
+    background-color: #fa5252;
+    color: white;
+}
+
+#deleteEvent:hover {
+    background-color: #e03131;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(250, 82, 82, 0.2);
+}
+
+#cancelEvent,
+#cancelNewEvent {
+    background-color: #f1f3f5;
+    color: #495057;
+}
+
+#cancelEvent:hover,
+#cancelNewEvent:hover {
+    background-color: #dee2e6;
+    transform: translateY(-2px);
+}
+
+/* 모달 진입 애니메이션 */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 모달 내 날짜 선택기 스타일 */
+.modal input[type="date"] {
+    position: relative;
+    padding-right: 40px;
+    cursor: pointer;
+}
+
+.modal input[type="date"]::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    filter: invert(60%) sepia(72%) saturate(1552%) hue-rotate(165deg) brightness(89%) contrast(101%);
+}
+
+/* 모달 내 이벤트 정보 표시 */
+.event-info {
+    background-color: #f8f9fa;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-left: 4px solid #0080c6;
+}
+
+.event-info-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.event-info-item:last-child {
+    margin-bottom: 0;
+}
+
+.event-info-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #e6f4ff;
+    color: #0080c6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.event-info-content {
+    flex: 1;
+}
+
+.event-info-label {
+    font-size: 12px;
+    color: #868e96;
+    margin-bottom: 2px;
+}
+
+.event-info-value {
+    font-size: 15px;
+    font-weight: 500;
+    color: #343a40;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 576px) {
+    .modal-content {
+        padding: 25px 20px;
+        margin: 60px auto;
+    }
+
+    .modal h2 {
+        font-size: 20px;
+    }
+
+    .form-group label {
+        font-size: 14px;
+    }
+
+    .modal input[type="text"],
+    .modal input[type="date"],
+    .modal textarea,
+    .modal select {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+    }
+
+    .modal-buttons button {
+        width: 100%;
+        padding: 12px;
+    }
+    
+    .event-info {
+        padding: 15px;
+    }
+    
+    .event-info-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+}

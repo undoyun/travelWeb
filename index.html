@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>여행 계획 표시</title>
+  <style>
+    table {
+      border-collapse: collapse;
+      width: 80%;
+      margin-bottom: 30px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    .day-title {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    button {
+      margin: 20px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>GPT 여행 계획 결과</h1>
+    <button onclick="displayItinerary()">여행 일정 보기</button>
+    <div id="itinerary"></div>
+  </div>
+
+  <script>
+    // GPT에서 받은 JSON 데이터 예시 (직접 받아오면 이 부분을 대체/수정 가능)
+    const tripData = {
+      "trip": {
+        "destination": "부산",
+        "duration": 5,
+        "start_date": "2025-04-01",
+        "end_date": "2025-04-05",
+        "transportation": "기차(KTX)",
+        "budget": "50만원",
+        "itinerary": [
+          {
+            "day": 1,
+            "date": "2025-04-01",
+            "schedule": [
+              {
+                "time": "09:00",
+                "activity": "부산 도착 (부산역)",
+                "location": "부산역"
+              },
+              {
+                "time": "10:30",
+                "activity": "광안리 해수욕장 산책 및 사진 촬영",
+                "location": "광안리 해수욕장"
+              },
+              {
+                "time": "12:00",
+                "activity": "점심 - 돼지국밥 맛집 방문",
+                "location": "쌍둥이 돼지국밥"
+              },
+              {
+                "time": "14:00",
+                "activity": "해운대 방문 및 블루라인파크 해변열차 탑승",
+                "location": "해운대"
+              },
+              {
+                "time": "17:00",
+                "activity": "더베이 101에서 야경 감상",
+                "location": "더베이 101"
+              },
+              {
+                "time": "19:00",
+                "activity": "저녁 - 씨푸드 뷔페",
+                "location": "해운대 근처"
+              }
+            ]
+          },
+          {
+            "day": 2,
+            "date": "2025-04-02",
+            "schedule": [
+              {
+                "time": "09:00",
+                "activity": "태종대 방문 및 다누비 열차 탑승",
+                "location": "태종대"
+              },
+              {
+                "time": "12:00",
+                "activity": "점심 - 밀면 맛집 방문",
+                "location": "부산밀면"
+              },
+              {
+                "time": "14:00",
+                "activity": "송도 해수욕장 및 송도 케이블카 탑승",
+                "location": "송도 해수욕장"
+              },
+              {
+                "time": "17:00",
+                "activity": "자갈치 시장 방문 및 해산물 먹기",
+                "location": "자갈치 시장"
+              },
+              {
+                "time": "19:00",
+                "activity": "BIFF 광장 야경 및 야시장 탐방",
+                "location": "BIFF 광장"
+              }
+            ]
+          },
+          {
+            "day": 3,
+            "date": "2025-04-03",
+            "schedule": [
+              {
+                "time": "09:00",
+                "activity": "감천문화마을 방문 및 벽화 구경",
+                "location": "감천문화마을"
+              },
+              {
+                "time": "12:00",
+                "activity": "점심 - 씨앗호떡 및 부산 어묵 먹기",
+                "location": "남포동"
+              },
+              {
+                "time": "14:00",
+                "activity": "흰여울문화마을 방문",
+                "location": "흰여울문화마을"
+              },
+              {
+                "time": "16:00",
+                "activity": "송정 해수욕장 및 카페 투어",
+                "location": "송정 해수욕장"
+              },
+              {
+                "time": "19:00",
+                "activity": "저녁 - 회정식",
+                "location": "해운대 근처"
+              }
+            ]
+          },
+          {
+            "day": 4,
+            "date": "2025-04-04",
+            "schedule": [
+              {
+                "time": "09:00",
+                "activity": "달맞이길 드라이브 및 카페 투어",
+                "location": "달맞이길"
+              },
+              {
+                "time": "11:00",
+                "activity": "해동 용궁사 방문",
+                "location": "해동 용궁사"
+              },
+              {
+                "time": "13:00",
+                "activity": "점심 - 장어구이 맛집",
+                "location": "기장"
+              },
+              {
+                "time": "15:00",
+                "activity": "오시리아 관광단지 및 롯데월드 부산 방문",
+                "location": "롯데월드 부산"
+              },
+              {
+                "time": "19:00",
+                "activity": "저녁 - 한우 오마카세",
+                "location": "해운대 근처"
+              }
+            ]
+          },
+          {
+            "day": 5,
+            "date": "2025-04-05",
+            "schedule": [
+              {
+                "time": "09:00",
+                "activity": "부산 현대미술관 방문",
+                "location": "부산 현대미술관"
+              },
+              {
+                "time": "11:30",
+                "activity": "점심 - 국밥 한 그릇",
+                "location": "부산역 근처"
+              },
+              {
+                "time": "13:00",
+                "activity": "국제시장 및 깡통시장 쇼핑",
+                "location": "국제시장"
+              },
+              {
+                "time": "15:00",
+                "activity": "부산역 이동 및 기념품 구매",
+                "location": "부산역"
+              },
+              {
+                "time": "16:00",
+                "activity": "부산 출발",
+                "location": "부산역"
+              }
+            ]
+          }
+        ]
+      }
+    };
+
+    // "여행 일정 보기" 버튼 클릭 시 호줄되는 함수
+    function displayItinerary() {
+      const itineraryContainer = document.getElementById("itinerary");
+
+      // 이미 내용이 있다면 초기화
+      itineraryContainer.innerHTML = "";
+
+      const itinerary = tripData.trip.itinerary;
+
+      itinerary.forEach(dayInfo => {
+        const dayTitle = document.createElement("h2");
+        dayTitle.className = "day-title";
+        dayTitle.textContent = `${dayInfo.day}일차 (${dayInfo.date})`;
+        itineraryContainer.appendChild(dayTitle);
+
+        // 테이블 생성
+        const table = document.createElement("table");
+        
+        // 테이블 헤더
+        const thead = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+
+        const timeHeader = document.createElement("th");
+        timeHeader.textContent = "시간";
+        headerRow.appendChild(timeHeader);
+
+        const activityHeader = document.createElement("th");
+        activityHeader.textContent = "활동";
+        headerRow.appendChild(activityHeader);
+
+        const locationHeader = document.createElement("th");
+        locationHeader.textContent = "장소";
+        headerRow.appendChild(locationHeader);
+
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+
+        // 테이블 바디
+        const tbody = document.createElement("tbody");
+
+        dayInfo.schedule.forEach(item => {
+          const row = document.createElement("tr");
+
+          const timeCell = document.createElement("td");
+          timeCell.textContent = item.time;
+          row.appendChild(timeCell);
+
+          const activityCell = document.createElement("td");
+          activityCell.textContent = item.activity;
+          row.appendChild(activityCell);
+
+          const locationCell = document.createElement("td");
+          locationCell.textContent = item.location;
+          row.appendChild(locationCell);
+
+          tbody.appendChild(row);
+        });
+
+        table.appendChild(tbody);
+        itineraryContainer.appendChild(table);
+      });
+    }
+  </script>
+</body>
+</html> 

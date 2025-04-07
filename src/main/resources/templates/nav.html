@@ -1,0 +1,36 @@
+<header th:fragment="navbar" class="standard-navbar">
+    <div class="nav-container">
+        <a th:href="@{/main}" class="logo">
+            <div class="logo-wrapper">
+                <span class="logo-main">
+                    ワクワク
+                </span>
+            </div>
+        </a>
+        <nav class="nav-links">
+            <a th:href="@{/attractions}" class="nav-item">관광 명소</a>
+            <a th:href="@{/itineraries/itineraryMain}" class="nav-item">여행 생성</a>
+            <a th:href="@{/reviews/list}" class="nav-item">커뮤니티</a>
+            <a th:href="@{/counseling/faq}" class="nav-item">고객지원</a>
+
+            <div class="user-menu">
+                <a href="#" class="user-icon" onclick="toggleMenu()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>마이페이지</span>
+                </a>
+                <div class="dropdown-menu" id="dropdownMenu">
+                    <a th:href="@{/schedule/schedule}">나의 여행</a>
+                    <a th:href="@{/counseling}">1:1 문의</a>
+                    <a th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}" th:href="@{/admin}">
+                        관리자 대시보드
+                    </a>
+                    <a th:href="@{/users/logout}">로그아웃</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>

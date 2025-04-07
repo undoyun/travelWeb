@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 여행 일정</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/schedule/schedule.css}">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+</head>
+
+<body>
+    <!-- 네비게이션 바 포함 -->
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <!-- Profile Section -->
+    <div class="profile-container">
+        <div class="profile-pic">
+            <i class="fas fa-user"></i>
+        </div>
+        <div class="username" th:text="${user != null && user.nickname != null ? user.nickname : '사용자'}">user7593241001</div>
+        <div class="profile-badge">프로필 관리 <i class="fas fa-star"></i></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <div class="tab active" id="tab-upcoming">나의 일정 <span th:text="${schedules.size()}">1</span></div>
+        <div class="tab" id="tab-history">나의 여행 도시 목록 <span>0</span></div>
+    </div>
+
+    <!-- Content -->
+    <div class="content-container">
+        <!-- Upcoming Travel Plans Tab -->
+        <div class="tab-content active" id="content-upcoming">
+            <div class="filter-bar">
+                <div class="filter-title">
+                    예정된 여행
+                </div>
+                <div class="sort-options">
+                    <div class="sort-option active" id="sort-newest">최신순</div>
+                    <div class="sort-option" id="sort-oldest">오래된순</div>
+                </div>
+            </div>
+
+            <div id="travel-cards-container">
+                <div th:each="sch : ${schedules}" class="travel-card" th:data-date="${sch.startDate}"
+                    th:data-end-date="${sch.endDate}" th:onclick="|window.location='/schedule/details/' + ${sch.id}|">
+                    <div class="card-image"
+                        th:style="${sch.planPhoto != null && !sch.planPhoto.isEmpty()} ? |background-image: url('${sch.planPhoto}')| : |background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop')|">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-label" th:text="${sch.purpose}">여행 목적</div>
+                        <h3 class="card-title" th:text="${sch.planName}">여행 계획 이름</h3>
+                        <div class="card-details">
+                            <span th:text="'출발: ' + ${sch.departLocation} + ' | 목적지: ' + ${sch.destination}">출발: 서울 |
+                                목적지: 후쿠오카</span>
+                        </div>
+                        <div class="card-date">
+                            <i class="far fa-calendar-alt" style="margin-right: 5px;"></i>
+                            <span th:text="${sch.startDate} + ' ~ ' + ${sch.endDate}">2024-02-04 ~ 2024-02-08</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Travel History Tab -->
+        <div class="tab-content" id="content-history">
+            <div class="filter-bar">
+                <div class="filter-title">
+                    여행 히스토리
+                </div>
+                <div class="sort-options">
+                    <div class="sort-option active" id="sort-history-newest">최신순</div>
+                    <div class="sort-option" id="sort-history-oldest">오래된순</div>
+                </div>
+            </div>
+
+            <!-- 여행 히스토리 카드 컨테이너 -->
+            <div id="history-cards-container">
+                <div th:each="history : ${historySchedules}" class="history-card" th:data-date="${history.startDate}"
+                    th:data-end-date="${history.endDate}"
+                    th:onclick="|window.location='/schedule/details/' + ${history.id}|">
+                    <div class="card-image"
+                        th:style="${history.planPhoto != null && !history.planPhoto.isEmpty()} ? |background-image: url('${history.planPhoto}')| : |background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop')|">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-label" th:text="${history.purpose}">여행 목적</div>
+                        <h3 class="card-title" th:text="${history.planName}">여행 계획 이름</h3>
+                        <div class="card-details">
+                            <span th:text="'출발: ' + ${history.departLocation} + ' | 목적지: ' + ${history.destination}">출발:
+                                서울 |
+                                목적지: 후쿠오카</span>
+                        </div>
+                        <div class="card-date">
+                            <i class="far fa-calendar-alt" style="margin-right: 5px;"></i>
+                            <span th:text="${history.startDate} + ' ~ ' + ${history.endDate}">2024-02-04 ~
+                                2024-02-08</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 새 여행 계획 버튼 (모바일에서 고정) -->
+    <a href="/itineraries/itineraryCreate" class="floating-btn">
+        <i class="fas fa-plus"></i>
+    </a>
+
+    <!-- 일정 데이터를 JSON으로 전달 -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const schedulesJsonData = /*[[${schedules}]]*/[];
+        /*]]>*/
+    </script>
+
+    <script th:src="@{/js/schedule/myPage.js}"></script>
+    <script th:src="@{/js/main/main.js}"></script>
+    <script th:src="@{/js/main/nav.js}"></script>
+</body>
+
+</html>

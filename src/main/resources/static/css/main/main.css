@@ -1,0 +1,1002 @@
+/* 전체 사이트 공통 스타일 */
+:root {
+    --primary-color: #0080c6;
+    --primary-light: #e6f4ff;
+    --primary-dark: #005a8c;
+    --secondary-color: #ffffff;
+    --accent-color: #FF6B6B;
+    --accent-light: #FFE3E3;
+    --text-color: #343a40;
+    --text-light: #868e96;
+    --background-color: #f8f9fa;
+    --border-color: #dee2e6;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+    --busan-color: #0080c6;
+    --busan-light: #e6f4ff;
+    --busan-dark: #005a8c;
+    --busan-gradient: linear-gradient(135deg, #0080c6, #005a8c);
+    --busan-accent: #FF6B6B;
+}
+
+/* 기본 리셋 및 공통 스타일 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    color: var(--text-color);
+    background-color: var(--background-color);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+a {
+    text-decoration: none;
+    color: var(--text-color);
+    transition: var(--transition);
+}
+
+a:hover {
+    color: var(--primary-color);
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background-color: var(--busan-color);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 500;
+    transition: var(--transition);
+    font-size: 14px;
+    letter-spacing: 0.3px;
+    box-shadow: var(--shadow);
+}
+
+button:hover {
+    background-color: var(--busan-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--hover-shadow);
+}
+
+input,
+select,
+textarea {
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-family: inherit;
+    transition: var(--transition);
+    width: 100%;
+    font-size: 14px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.1);
+}
+
+/* 메인 컨테이너 레이아웃 */
+.main-container {
+    display: flex;
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 0 30px 50px;
+    gap: 30px;
+}
+
+/* 사이드 패널 스타일 */
+.side-panel {
+    width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+/* 통계 섹션 스타일 */
+.stats-section {
+    background-color: var(--secondary-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 25px;
+    transition: all 0.3s ease;
+}
+
+.stats-section:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-5px);
+}
+
+.stats-section h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stats-section h3 i {
+    color: var(--busan-color);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.stat-card {
+    background-color: var(--background-color);
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+    background-color: var(--busan-light);
+}
+
+.stat-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    background-color: var(--busan-light);
+    color: var(--busan-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.stat-info h4 {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 5px;
+}
+
+.stat-info p {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-color);
+    min-height: 27px;
+    display: flex;
+    align-items: center;
+}
+
+/* 계획 없음 스타일 */
+.no-plan {
+    font-size: 15px;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+/* 날씨 위젯 개선 */
+.weather-widget {
+    margin-top: 20px;
+    background-color: var(--secondary-color);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.weather-widget:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-5px);
+}
+
+.weather-loading {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-light);
+}
+
+.weather-loading i {
+    margin-right: 8px;
+    color: var(--busan-color);
+}
+
+/* 다가오는 여행 리스트 스타일 */
+.upcoming-trips {
+    background-color: var(--secondary-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 25px;
+    transition: all 0.3s ease;
+}
+
+.upcoming-trips:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-5px);
+}
+
+.upcoming-trips h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.upcoming-trips h3 i {
+    color: var(--busan-color);
+}
+
+.empty-trips {
+    text-align: center;
+    padding: 30px 0;
+    color: var(--text-light);
+    background-color: var(--background-color);
+    border-radius: 12px;
+}
+
+.create-trip-btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 20px;
+    background-color: var(--busan-color);
+    color: white;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.create-trip-btn:hover {
+    background-color: var(--busan-dark);
+    transform: translateY(-2px);
+}
+
+/* 종료된 여행 리스트 스타일 */
+.completed-trips {
+    background-color: var(--secondary-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 25px;
+    transition: all 0.3s ease;
+    margin-top: 30px;
+}
+
+.completed-trips:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-5px);
+}
+
+.completed-trips h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.completed-trips h3 i {
+    color: var(--accent-color);
+}
+
+.has-review {
+    color: #4CAF50 !important;
+    font-weight: 500 !important;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.has-review i {
+    color: #4CAF50;
+    font-size: 16px;
+}
+
+.no-review {
+    color: var(--accent-color) !important;
+    font-weight: 600 !important;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    animation: pulse 2s infinite;
+}
+
+.no-review i {
+    color: var(--accent-color);
+    font-size: 16px;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.trip-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.trip-card {
+    background-color: var(--background-color);
+    border-radius: 12px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.trip-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+    background-color: var(--busan-light);
+}
+
+.trip-date {
+    width: 65px;
+    height: 65px;
+    border-radius: 12px;
+    background-color: var(--busan-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 18px;
+    color: white;
+}
+
+.date-number {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 3px;
+}
+
+.date-month {
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.trip-info {
+    flex-grow: 1;
+}
+
+.trip-info h4 {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.trip-info p {
+    font-size: 14px;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 3px;
+}
+
+.trip-view-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background-color: var(--busan-light);
+    color: var(--busan-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+.trip-view-btn:hover {
+    background-color: var(--busan-color);
+    color: white;
+    transform: translateX(3px);
+}
+
+/* 추천 여행 정보 스타일 */
+.recommendations {
+    background-color: var(--secondary-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 25px;
+    transition: all 0.3s ease;
+}
+
+.recommendations:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-5px);
+}
+
+.recommendations h3 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.recommendations h3 i {
+    color: var(--busan-color);
+}
+
+.recommendation-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.recommendation-card {
+    display: flex;
+    background-color: var(--background-color);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 120px;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+}
+
+.recommendation-card img {
+    width: 120px;
+    height: 100%;
+    object-fit: cover;
+}
+
+.recommendation-info {
+    flex: 1;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.recommendation-info h4 {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.recommendation-info p {
+    font-size: 13px;
+    color: var(--text-light);
+    margin-bottom: 10px;
+    flex: 1;
+}
+
+.view-more {
+    font-size: 13px;
+    color: var(--busan-color);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    align-self: flex-start;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background-color: var(--busan-light);
+    transition: all 0.3s ease;
+}
+
+.view-more:hover {
+    background-color: var(--busan-color);
+    color: white;
+    transform: translateX(3px);
+}
+
+.view-more i {
+    font-size: 10px;
+    transition: all 0.3s ease;
+}
+
+.view-more:hover i {
+    transform: translateX(3px);
+}
+
+/* 캘린더 컨테이너 스타일 */
+#calendar-container {
+    flex: 1;
+    background-color: var(--secondary-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: all 0.3s ease;
+}
+
+#calendar-container:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-5px);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.calendar-header h2 {
+    font-size: 22px;
+    color: var(--text-color);
+    font-weight: 700;
+}
+
+.calendar-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-create-event {
+    background-color: var(--busan-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-create-event:hover {
+    background-color: var(--busan-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 128, 198, 0.2);
+}
+
+.btn-today {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+.btn-today:hover {
+    background-color: var(--border-color);
+    transform: translateY(-3px);
+}
+
+/* 뷰 선택 탭 스타일 */
+.view-selector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.view-btn {
+    background-color: var(--background-color);
+    color: var(--text-color);
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.view-btn:hover {
+    background-color: var(--busan-light);
+    color: var(--busan-dark);
+}
+
+.view-btn.active {
+    background-color: var(--busan-color);
+    color: white;
+}
+
+/* 푸터 스타일 */
+.main-footer {
+    background-color: var(--secondary-color);
+    padding: 60px 0 30px;
+    margin-top: 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 40px;
+}
+
+.footer-logo h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--busan-color);
+    margin-bottom: 10px;
+}
+
+.footer-logo p {
+    color: var(--text-light);
+    max-width: 300px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 60px;
+    flex-wrap: wrap;
+}
+
+.footer-section h4 {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: var(--text-color);
+}
+
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin-bottom: 12px;
+}
+
+.footer-section ul li a {
+    color: var(--text-light);
+    transition: all 0.3s ease;
+}
+
+.footer-section ul li a:hover {
+    color: var(--busan-color);
+}
+
+.social-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.3s ease;
+}
+
+.social-icon:hover {
+    background-color: var(--busan-color);
+    color: white;
+    transform: translateY(-3px);
+}
+
+.footer-bottom {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 30px 0;
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    margin-top: 40px;
+}
+
+.footer-bottom p {
+    color: var(--text-light);
+    font-size: 14px;
+}
+
+/* 환영 배너 스타일 */
+.welcome-banner {
+    width: 92%;
+    margin: 0 auto;
+    align-items: center;
+    height: 600px;
+    position: relative;
+    overflow: hidden;
+    margin-top: 25px;
+    margin-bottom: 40px;
+    border-radius: 10px;
+}
+
+.banner-slider {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.banner-slide {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    transition: opacity 1s ease;
+    z-index: 0;
+}
+
+/* 각 슬라이드별 배경 이미지 */
+.banner-slide:nth-child(1) {
+    background-image: url('/img/main/beach.jpeg');
+}
+
+.banner-slide:nth-child(2) {
+    background-image: url('/img/main/56do.jpg');
+}
+
+.banner-slide:nth-child(3) {
+    background-image: url('/img/main/songdo.png');
+}
+
+.banner-slide:nth-child(4) {
+    background-image: url('/img/main/dongre.jpeg');
+}
+
+.banner-slide.active {
+    opacity: 1;
+    z-index: 1;
+}
+
+.banner-slide::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.5) 100%);
+}
+
+.banner-content {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px 60px;
+    position: relative;
+    z-index: 2;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.banner-content h1 {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.3;
+    max-width: 800px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.banner-pagination {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 15px;
+}
+
+.pagination-controls button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-shadow: none;
+    cursor: pointer;
+    border: none;
+}
+
+.pagination-controls button:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(0);
+}
+
+/* 버튼 스타일 추가 */
+.prev-slide,
+.next-slide,
+.pause-slide {
+    z-index: 10;
+}
+
+/* 유틸리티 클래스 */
+.hidden {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+/* 토스트 메시지 스타일 */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: white;
+    color: #343a40;
+    padding: 16px 25px;
+    border-radius: 8px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    z-index: 2000;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.toast.success {
+    border-left: 4px solid #40c057;
+}
+
+.toast.error {
+    border-left: 4px solid #fa5252;
+}
+
+.toast.warning {
+    border-left: 4px solid #fd7e14;
+}
+
+.toast.info {
+    border-left: 4px solid #4dabf7;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 1200px) {
+    .main-container {
+        flex-direction: column;
+    }
+
+    .side-panel {
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+    
+    .banner-content h1 {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 992px) {
+    .welcome-banner {
+        height: 500px;
+    }
+
+    .banner-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        padding-bottom: 40px;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .main-container {
+        padding: 20px 15px;
+    }
+
+    .calendar-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .calendar-actions {
+        width: 100%;
+    }
+
+    .btn-today, .btn-create-event {
+        flex: 1;
+        justify-content: center;
+    }
+    
+    .footer-container {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .footer-links {
+        flex-direction: column;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 576px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .recommendation-card {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .recommendation-card img {
+        width: 100%;
+        height: 150px;
+    }
+    
+    .welcome-banner {
+        height: 400px;
+    }
+
+    .banner-content h1 {
+        font-size: 24px;
+    }
+
+    .banner-pagination {
+        font-size: 16px;
+    }
+
+    .pagination-controls button {
+        width: 32px;
+        height: 32px;
+    }
+}

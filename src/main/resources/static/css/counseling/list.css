@@ -1,0 +1,359 @@
+/* 문의 목록 페이지 스타일 */
+:root {
+    --busan-color: #0080c6;
+    --busan-light: #e6f4ff;
+    --busan-dark: #005a8c;
+    --busan-accent: #ffc107;
+    --secondary-color: #ffffff;
+    --text-color: #343a40;
+    --text-light: #868e96;
+    --background-color: #f8f9fa;
+    --border-color: #dee2e6;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 30px auto;
+}
+
+/* 페이지 헤더 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--busan-light);
+}
+
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--busan-dark);
+    position: relative;
+    padding-left: 1.2rem;
+}
+
+.page-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 70%;
+    background: linear-gradient(to bottom, var(--busan-color), var(--busan-dark));
+    border-radius: 3px;
+}
+
+/* 필터 및 검색 영역 */
+.filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.filter-group {
+    flex: 1;
+    min-width: 200px;
+}
+
+.filter-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    font-size: 0.9rem;
+}
+
+.filter-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background-color: white;
+    font-family: inherit;
+    font-size: 0.95rem;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 1rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    padding-right: 2.5rem;
+    transition: var(--transition);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--busan-color);
+    box-shadow: 0 0 0 3px var(--busan-light);
+}
+
+.search-group {
+    flex: 2;
+    min-width: 300px;
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--busan-color);
+    box-shadow: 0 0 0 3px var(--busan-light);
+}
+
+.search-btn {
+    padding: 0.75rem 1.5rem;
+    background-color: var(--busan-color);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.search-btn:hover {
+    background-color: var(--busan-dark);
+}
+
+/* 목록 테이블 */
+.counseling-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    margin-bottom: 2rem;
+}
+
+.counseling-table th,
+.counseling-table td {
+    padding: 1.2rem 1rem;
+    text-align: left;
+}
+
+.counseling-table th {
+    background-color: var(--busan-light);
+    color: var(--busan-dark);
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.counseling-table tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.counseling-table tr:last-child {
+    border-bottom: none;
+}
+
+.counseling-table tr:hover {
+    background-color: var(--busan-light);
+}
+
+.counseling-title {
+    color: var(--text-color);
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.counseling-title:hover {
+    color: var(--busan-color);
+}
+
+/* 상태 및 카테고리 배지 */
+.status-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.status-answered {
+    background-color: #efffef;
+    color: #10b981;
+    border: 1px solid #dcfce7;
+}
+
+.status-waiting {
+    background-color: #fff7ed;
+    color: #f59e0b;
+    border: 1px solid #fff3e0;
+}
+
+.category-badge {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 20px;
+    background-color: var(--busan-light);
+    color: var(--busan-dark);
+    text-align: center;
+}
+
+/* 페이지네이션 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2rem;
+}
+
+.page-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+}
+
+.page-link:hover,
+.page-link.active {
+    background-color: var(--busan-color);
+    color: white;
+}
+
+.page-link.disabled {
+    background-color: var(--background-color);
+    color: var(--text-light);
+    pointer-events: none;
+}
+
+/* 새 문의 작성 버튼 */
+.new-counseling-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--busan-color);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: var(--transition);
+    box-shadow: var(--shadow);
+}
+
+.new-counseling-btn:hover {
+    background-color: var(--busan-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--hover-shadow);
+}
+
+/* 문의 없음 메시지 */
+.no-counselings {
+    padding: 3rem;
+    text-align: center;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+}
+
+.no-counselings i {
+    font-size: 3rem;
+    color: var(--busan-light);
+    margin-bottom: 1.5rem;
+}
+
+.no-counselings h3 {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin-bottom: 1rem;
+}
+
+.no-counselings p {
+    color: var(--text-light);
+    margin-bottom: 1.5rem;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .container {
+        width: 95%;
+        margin: 20px auto;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .filter-bar {
+        flex-direction: column;
+        padding: 1.2rem;
+    }
+
+    .search-group {
+        flex-direction: column;
+    }
+
+    .counseling-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .counseling-table th,
+    .counseling-table td {
+        padding: 1rem 0.75rem;
+    }
+
+    .page-link {
+        width: 35px;
+        height: 35px;
+    }
+}

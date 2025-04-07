@@ -1,0 +1,36 @@
+<header th:fragment="adminTopNav" class="standard-navbar">
+    <div class="nav-container">
+        <a th:href="@{/admin}" class="logo">
+            <div class="logo-wrapper">
+                <span class="admin-logo-main">ワクワク</span>
+                <span class="admin-label">Admin</span>
+            </div>
+        </a>
+        <nav class="nav-links">
+            <a th:href="@{/admin/users}" class="nav-item">
+                유저 관리
+            </a>
+            <a th:href="@{/admin/reviews}" class="nav-item">
+                리뷰 관리
+            </a>
+            <a th:href="@{/admin/inquiries}" class="nav-item">
+                문의 관리
+            </a>
+
+            <div class="user-menu">
+                <a href="#" class="user-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    <span>관리자</span>
+                </a>
+                <div id="dropdownMenu" class="dropdown-menu">
+                    <a href="/main">메인으로 이동</a>
+                    <a href="/users/logout">로그아웃</a>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>추가 정보 입력</title>
+</head>
+
+<body>
+    <h2>추가 정보 입력</h2>
+    <form action="/users/add-info" method="post">
+        <label>닉네임: <input type="text" name="nickname" required></label><br>
+        <label>성별:
+            <select name="gender" required>
+                <option value="남">남</option>
+                <option value="여">여</option>
+            </select>
+        </label><br>
+        <label>생년월일: <input type="date" name="birthdate" required></label><br>
+        <button type="submit">가입 완료</button>
+    </form>
+</body>
+
+</html>

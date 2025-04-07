@@ -1,0 +1,586 @@
+/* 부산 관광 컬러 시스템 */
+:root {
+    --busan-color: #0080c6;
+    /* 부산 대표 색상 */
+    --busan-light: #e6f4ff;
+    --busan-dark: #005a8c;
+    --busan-accent: #ffc107;
+    /* 강조 색상 */
+    --secondary-color: #ffffff;
+    --text-color: #343a40;
+    --text-light: #868e96;
+    --background-color: #f8f9fa;
+    --border-color: #dee2e6;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.reviews-wrapper {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 20px;
+}
+
+/* 헤더 영역 */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--busan-light);
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--busan-dark);
+    position: relative;
+    padding-left: 1rem;
+}
+
+.page-title::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 5px;
+    height: 70%;
+    background: linear-gradient(to bottom, var(--busan-color), var(--busan-dark));
+    border-radius: 3px;
+}
+
+.write-btn {
+    background: linear-gradient(135deg, var(--busan-color), var(--busan-dark));
+    color: white;
+    border: none;
+    border-radius: 30px;
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    box-shadow: 0 3px 10px rgba(0, 128, 198, 0.2);
+}
+
+.write-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 128, 198, 0.3);
+}
+
+.write-btn i {
+    font-size: 1.1rem;
+}
+
+/* 기능 컨트롤 영역 */
+.controls-area {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* 검색 영역 */
+.search-box {
+    background-color: white;
+    border-radius: 15px;
+    padding: 1.2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.search-form {
+    display: flex;
+    width: 100%;
+    border-radius: 50px;
+    overflow: hidden;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.search-form:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-color: var(--busan-color);
+}
+
+.search-input {
+    flex: 1;
+    padding: 0.8rem 1.2rem;
+    border: none;
+    font-size: 0.95rem;
+    outline: none;
+    background-color: transparent;
+    color: var(--text-color);
+}
+
+.search-btn {
+    background: linear-gradient(135deg, var(--busan-color), var(--busan-dark));
+    border: none;
+    padding: 0 1.5rem;
+    cursor: pointer;
+    transition: var(--transition);
+    color: white;
+    font-size: 1rem;
+}
+
+.search-btn:hover {
+    background: linear-gradient(135deg, var(--busan-dark), var(--busan-color));
+}
+
+/* 필터 영역 */
+.filter-box {
+    background-color: white;
+    border-radius: 15px;
+    padding: 1.2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.filter-options {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: var(--busan-dark);
+}
+
+.filter-select {
+    padding: 0.7rem 1.2rem;
+    background-color: var(--busan-light);
+    border: none;
+    border-radius: 30px;
+    font-size: 0.95rem;
+    color: var(--busan-dark);
+    font-weight: 500;
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.filter-select:hover,
+.filter-select:focus {
+    background-color: var(--busan-color);
+    color: white;
+    box-shadow: 0 3px 10px rgba(0, 128, 198, 0.2);
+}
+
+.my-reviews-btn {
+    padding: 0.7rem 1.2rem;
+    background: linear-gradient(135deg, var(--busan-color), var(--busan-dark));
+    color: white;
+    border: none;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 3px 10px rgba(0, 128, 198, 0.2);
+}
+
+.my-reviews-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 128, 198, 0.3);
+}
+
+.my-reviews-btn i {
+    font-size: 1rem;
+}
+
+/* 검색 결과 표시 */
+.search-result {
+    background-color: var(--busan-light);
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    border-left: 4px solid var(--busan-color);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.search-result span {
+    color: var(--busan-color);
+    font-weight: 700;
+}
+
+/* 게시판 컨테이너 */
+.board-container {
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+}
+
+/* 게시판 테이블 스타일 */
+.board-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.board-table th {
+    padding: 1rem 0.8rem;
+    background-color: var(--busan-light);
+    color: var(--busan-dark);
+    font-weight: 600;
+    text-align: center;
+    border-top: 2px solid var(--busan-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.board-table th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.board-table th:last-child {
+    border-top-right-radius: 10px;
+}
+
+.board-table td {
+    padding: 1rem 0.8rem;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+}
+
+.board-table tr {
+    transition: var(--transition);
+}
+
+.board-table tr:hover {
+    background-color: var(--busan-light);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.board-table tr:hover td {
+    border-bottom-color: transparent;
+}
+
+.notice-row {
+    background-color: rgba(230, 244, 255, 0.5);
+}
+
+.board-table .notice-badge {
+    background-color: var(--busan-color);
+    color: white;
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.board-table .new-badge {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-left: 0.5rem;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.board-id {
+    width: 8%;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.board-destination {
+    width: 12%;
+}
+
+.destination-tag {
+    background-color: var(--busan-light);
+    color: var(--busan-dark);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.board-title-col {
+    width: 45%;
+    text-align: left;
+}
+
+.board-title-link {
+    color: var(--text-color);
+    text-decoration: none;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+}
+
+.board-title-link:hover {
+    color: var(--busan-color);
+}
+
+.review-rating-small {
+    display: inline-flex;
+    color: var(--busan-accent);
+    font-size: 0.9rem;
+    min-width: 80px;
+}
+
+.comment-count {
+    display: inline-flex;
+    align-items: center;
+    color: var(--busan-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+}
+
+.comment-count i {
+    margin-right: 0.2rem;
+}
+
+.board-author {
+    width: 15%;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.author-avatar-small {
+    width: 2rem;
+    height: 2rem;
+    background-color: var(--busan-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--busan-color);
+    font-weight: 600;
+    font-size: 0.85rem;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.board-date {
+    width: 12%;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.board-views {
+    width: 8%;
+    color: var(--text-light);
+}
+
+/* 빈 상태 표시 */
+.no-reviews {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+}
+
+.no-reviews-icon {
+    font-size: 3rem;
+    color: white;
+    background: linear-gradient(135deg, var(--busan-color), var(--busan-dark));
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    box-shadow: 0 8px 20px rgba(0, 128, 198, 0.15);
+}
+
+.no-reviews-text {
+    font-size: 1.8rem;
+    color: var(--busan-color);
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.no-reviews p {
+    font-size: 1.1rem;
+    max-width: 500px;
+    margin: 0 auto;
+    color: var(--text-light);
+}
+
+/* 페이지네이션 스타일 */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 0.7rem;
+    margin: 2rem 0;
+}
+
+.pagination a,
+.pagination span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: white;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: var(--transition);
+    font-size: 1rem;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+    font-weight: 500;
+}
+
+.pagination a:hover {
+    background-color: var(--busan-light);
+    color: var(--busan-color);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.1);
+}
+
+.pagination .active {
+    background: linear-gradient(135deg, var(--busan-color), var(--busan-dark));
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0, 128, 198, 0.2);
+}
+
+.pagination .disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 992px) {
+    .controls-area {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .board-id,
+    .board-views {
+        display: none;
+    }
+
+    .board-destination {
+        width: 18%;
+    }
+
+    .board-title-col {
+        width: 42%;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .filter-box {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .board-container {
+        padding: 1rem;
+    }
+
+    .board-table th,
+    .board-table td {
+        padding: 0.8rem 0.5rem;
+    }
+
+    .board-destination,
+    .board-date {
+        display: none;
+    }
+
+    .board-title-col {
+        width: 65%;
+    }
+
+    .board-author {
+        width: 35%;
+    }
+
+    .author-info {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .review-rating-small {
+        display: none;
+    }
+
+    .board-title-link {
+        font-size: 0.9rem;
+    }
+
+    .pagination a,
+    .pagination span {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+}

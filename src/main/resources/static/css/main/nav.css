@@ -1,0 +1,356 @@
+/* 헤더 및 네비게이션 스타일 */
+header {
+    background-color: var(--secondary-color);
+    box-shadow: var(--shadow);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--busan-color);
+    letter-spacing: 0.5px;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.logo:hover {
+    color: var(--busan-dark);
+}
+
+.logo-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+@keyframes rotateAndScale {
+    0% {
+        transform: rotate(0deg) scale(1);
+    }
+    25% {
+        transform: rotate(90deg) scale(0.8);
+    }
+    50% {
+        transform: rotate(180deg) scale(1.2);
+    }
+    75% {
+        transform: rotate(270deg) scale(0.8);
+    }
+    100% {
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+.logo:hover .rotating-box {
+    animation-duration: 1.5s;
+    animation-timing-function: linear;
+}
+
+.logo:hover .logo-main {
+    transform: translateY(-2px);
+}
+
+.logo-tag {
+    display: none; /* 태그 숨김 */
+}
+
+.logo-animation {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+.admin-label {
+    background-color: var(--busan-color);
+    color: white;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.nav-item {
+    font-weight: 500;
+    position: relative;
+    padding: 25px 0;
+    font-size: 15px;
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+.nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: var(--busan-color);
+    transition: var(--transition);
+}
+
+.nav-item:hover::after,
+.nav-item.active::after {
+    width: 100%;
+}
+
+.nav-item:hover {
+    color: var(--busan-color);
+}
+
+/* 사용자 메뉴 스타일 */
+.user-menu {
+    position: relative;
+}
+
+.user-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    background-color: var(--busan-light);
+    color: var(--busan-dark);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.user-icon:hover {
+    background-color: var(--busan-color);
+    color: white;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: var(--secondary-color);
+    box-shadow: var(--shadow);
+    border-radius: 12px;
+    min-width: 200px;
+    display: none;
+    z-index: 1000;
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
+    transition: var(--transition);
+}
+
+.dropdown-menu a.active {
+    background-color: var(--busan-light);
+    color: var(--busan-color);
+    font-weight: 600;
+}
+
+.dropdown-menu a:last-child {
+    border-bottom: none;
+}
+
+.dropdown-menu a:hover {
+    background-color: var(--primary-light);
+    color: var(--primary-dark);
+    padding-left: 25px;
+}
+
+.mark-all-read {
+    font-size: 12px;
+    color: var(--busan-color);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.mark-all-read:hover {
+    color: var(--busan-dark);
+    text-decoration: underline;
+}
+
+.empty-notifications {
+    padding: 30px 20px;
+    text-align: center;
+    color: var(--text-light);
+}
+
+.notification-items {
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    transition: var(--transition);
+    position: relative;
+}
+
+.notification-item:hover {
+    background-color: var(--busan-light);
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+.notification-item .notification-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    margin-right: 15px;
+    background-color: var(--busan-light);
+}
+
+.notification-item .notification-icon.info {
+    background-color: var(--busan-light);
+    color: var(--busan-color);
+}
+
+.notification-item .notification-icon.warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.notification-item .notification-icon.success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-content p {
+    font-size: 13px;
+    margin: 0 0 5px;
+    color: var(--text-color);
+}
+
+.notification-time {
+    font-size: 11px;
+    color: var(--text-light);
+}
+
+.notification-dismiss {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 5px;
+    margin-left: 10px;
+    opacity: 0.5;
+    transition: var(--transition);
+}
+
+.notification-dismiss:hover {
+    opacity: 1;
+    color: var(--busan-accent);
+}
+
+.notification-footer {
+    padding: 12px 20px;
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+}
+
+.notification-footer a {
+    font-size: 13px;
+    color: var(--busan-color);
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.notification-footer a:hover {
+    color: var(--busan-dark);
+    text-decoration: underline;
+}
+
+/* 표준 네비게이션 바 스타일 */
+.standard-navbar {
+    background-color: var(--secondary-color);
+    box-shadow: var(--shadow);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    .nav-container {
+        padding: 0 20px;
+    }
+
+    .nav-links {
+        gap: 15px;
+    }
+
+    .notification-dropdown {
+        width: 280px;
+        right: -70px;
+    }
+}
+
+@media (max-width: 576px) {
+    .nav-container {
+        flex-direction: column;
+        height: auto;
+        padding: 15px;
+    }
+
+    .logo {
+        margin-bottom: 10px;
+    }
+
+    .nav-links {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .nav-item {
+        padding: 10px 0;
+    }
+
+    .nav-item::after {
+        bottom: 5px;
+    }
+
+    .notification-dropdown {
+        width: 260px;
+        right: -50px;
+    }
+}

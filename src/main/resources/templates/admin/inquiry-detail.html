@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문의 상세 | 관리자</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/admin/adminNav.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminMain.css}">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <style>
+        :root {
+            --busan-color: #0080c6;
+            --busan-light: #e6f4ff;
+            --busan-dark: #005a8c;
+            --busan-accent: #ffc107;
+            --secondary-color: #ffffff;
+            --text-color: #343a40;
+            --text-light: #868e96;
+            --background-color: #f8f9fa;
+            --border-color: #dee2e6;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+            --success: #28A745;
+            --danger: #DC3545;
+            --warning: #FFC107;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px auto;
+        }
+
+        /* 페이지 네비게이션 */
+        .page-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--busan-light);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--busan-dark);
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .page-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 70%;
+            background: linear-gradient(to bottom, var(--busan-color), var(--busan-dark));
+            border-radius: 3px;
+        }
+
+        .board-navigation {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--busan-light);
+            color: var(--busan-dark);
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .back-link:hover {
+            background-color: var(--busan-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 128, 198, 0.2);
+        }
+
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+
+        /* 게시판 스타일 - 컨테이너 공통 */
+        .board-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        /* 게시물 헤더 */
+        .post-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, white 0%, var(--busan-light) 100%);
+        }
+
+        .post-category {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.4rem 1rem;
+            background-color: var(--busan-light);
+            color: var(--busan-dark);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            white-space: nowrap;
+        }
+
+        .post-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            color: var(--text-color);
+            line-height: 1.4;
+        }
+
+        .post-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-light);
+            font-size: 0.95rem;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            white-space: nowrap;
+        }
+
+        .meta-item i {
+            color: var(--busan-color);
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            white-space: nowrap;
+        }
+
+        .status-badge.answered {
+            background: #efffef;
+            color: #10b981;
+            border: 1px solid #dcfce7;
+        }
+
+        .status-badge.waiting {
+            background: #fff7ed;
+            color: #f59e0b;
+            border: 1px solid #fff3e0;
+        }
+
+        /* 게시물 컨텐츠 */
+        .post-content {
+            padding: 2rem;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            white-space: pre-line;
+            min-height: 180px;
+        }
+
+        /* 사용자 정보 */
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--busan-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .user-email {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* 답변 카드 */
+        .answer-card {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .answer-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--busan-light);
+        }
+
+        .answer-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: var(--busan-dark);
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .answer-content {
+            padding: 2rem;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            white-space: pre-line;
+        }
+
+        /* 답변 폼 */
+        .answer-form {
+            padding: 2rem;
+        }
+
+        .answer-form textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            resize: vertical;
+            margin-bottom: 1rem;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .answer-form textarea:focus {
+            outline: none;
+            border-color: var(--busan-color);
+            box-shadow: 0 0 0 3px rgba(0, 128, 198, 0.1);
+        }
+
+        /* 버튼 */
+        .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background-color: var(--busan-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--busan-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 128, 198, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--busan-light);
+            color: var(--busan-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .btn-danger {
+            background-color: #ffeeee;
+            color: #e74c3c;
+        }
+
+        .btn-danger:hover {
+            background-color: #e74c3c;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.2);
+        }
+
+        /* 알림 메시지 */
+        .alert {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #efffef;
+            color: #10b981;
+            border: 1px solid #dcfce7;
+        }
+
+        .alert-danger {
+            background-color: #ffeeee;
+            color: #e74c3c;
+            border: 1px solid #ffd1d1;
+        }
+
+        /* 모달 */
+        #myModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1001;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-header {
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .modal-title {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #333;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 24px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            text-align: right;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-secondary {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        /* 액션 버튼 영역 */
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+
+            .page-navigation {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                width: 100%;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .post-header,
+            .post-content,
+            .answer-header,
+            .answer-content {
+                padding: 1.2rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .post-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 상단 네비게이션 바 포함 -->
+    <div th:replace="~{admin/adminNav :: adminTopNav}"></div>
+
+    <div class="container">
+        <!-- 페이지 네비게이션 -->
+        <div class="page-navigation">
+            <h1 class="page-title">문의 상세보기</h1>
+            <div class="board-navigation">
+                <a th:href="@{/admin/inquiries}" class="back-link">
+                    <i class="fas fa-list"></i> 목록으로 돌아가기
+                </a>
+            </div>
+        </div>
+
+        <!-- 알림 메시지 표시 -->
+        <div th:if="${message}" class="alert alert-success" role="alert">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${message}">성공 메시지</span>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${error}">오류 메시지</span>
+        </div>
+
+        <!-- 문의 컨테이너 -->
+        <div class="board-container">
+            <!-- 문의 헤더 -->
+            <div class="post-header">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+                    <div class="post-category" th:text="${inquiry.category}">일반 문의</div>
+                    <span class="status-badge" th:classappend="${inquiry.answer != null and !#strings.isEmpty(inquiry.answer) ? 'answered' : 'waiting'}">
+                        <i th:class="${inquiry.answer != null and !#strings.isEmpty(inquiry.answer) ? 'fas fa-check-circle' : 'fas fa-circle-notch fa-spin'}"></i>
+                        <span th:text="${inquiry.answer != null and !#strings.isEmpty(inquiry.answer) ? '답변완료' : '미답변'}">미답변</span>
+                    </span>
+                </div>
+
+                <h1 class="post-title" th:text="${inquiry.title}">문의 제목</h1>
+
+                <div class="user-info">
+                    <div class="user-avatar" th:if="${inquiry.writer != null}">
+                        <span th:text="${#strings.substring(inquiry.writer, 0, 1)}">U</span>
+                    </div>
+                    <div class="user-details">
+                        <span class="user-name" th:text="${inquiry.writer ?: '알 수 없음'}">사용자</span>
+                        <span class="user-email" th:if="${inquiry.email != null}"
+                            th:text="${inquiry.email}">user@example.com</span>
+                        <span class="user-email" th:unless="${inquiry.email != null}">이메일 정보 없음</span>
+                    </div>
+                </div>
+
+                <div class="post-meta">
+                    <div class="meta-item">
+                        <i class="far fa-calendar-alt"></i>
+                        <span th:text="${#temporals.format(inquiry.createdAt, 'yyyy년 MM월 dd일 HH:mm')}">2023년 8월 1일
+                            14:30</span>
+                    </div>
+                    <div class="meta-item"
+                        th:if="${inquiry.contactNumber != null && !#strings.isEmpty(inquiry.contactNumber)}">
+                        <i class="fas fa-phone"></i>
+                        <span th:text="${inquiry.contactNumber}">010-1234-5678</span>
+                    </div>
+                    <div class="meta-item" th:if="${inquiry.answered && inquiry.answeredAt != null}">
+                        <i class="fas fa-reply"></i>
+                        <span>답변일: <span th:text="${#temporals.format(inquiry.answeredAt, 'yyyy년 MM월 dd일 HH:mm')}">2023년
+                                8월 2일 10:15</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 문의 내용 -->
+            <div class="post-content" th:text="${inquiry.content}">
+                문의 내용이 여기에 표시됩니다.
+            </div>
+        </div>
+
+        <!-- 답변 영역 -->
+        <div th:if="${inquiry.answer != null and !#strings.isEmpty(inquiry.answer)}" class="answer-card">
+            <div class="answer-header">
+                <div class="answer-title">
+                    <i class="fas fa-reply"></i>
+                    <span>답변</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-check"></i>
+                        <span th:text="${#temporals.format(inquiry.answeredAt, 'yyyy년 MM월 dd일 HH:mm')}">2023년 8월 2일 10:15</span>
+                    </div>
+                    <div class="meta-item" th:if="${inquiry.answeredBy != null}">
+                        <i class="fas fa-user-check"></i>
+                        <span th:text="${inquiry.answeredBy}">관리자</span>
+                    </div>
+                    <span class="status-badge answered">
+                        <i class="fas fa-check-circle"></i>
+                        <span>처리완료</span>
+                    </span>
+                </div>
+            </div>
+            <div class="answer-content">
+                <p th:text="${inquiry.answer}">답변 내용이 표시됩니다.</p>
+            </div>
+            <div class="p-3 border-top bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="alert alert-success m-0" style="flex: 1;">
+                        <i class="fas fa-info-circle"></i>
+                        <span>이 문의는 이미 답변 완료 상태입니다. 필요한 경우 상태를 갱신하거나 답변을 수정할 수 있습니다.</span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <form th:action="@{'/admin/inquiries/' + ${inquiry.id} + '/update-status'}" method="post" style="margin: 0;">
+                            <input type="hidden" name="adminId" value="admin" />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-sync-alt"></i> 답변 상태 갱신
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-warning" id="editAnswerBtn">
+                            <i class="fas fa-edit"></i> 답변 수정
+                        </button>
+                        <button type="button" class="btn btn-danger" id="deleteBtn">
+                            <i class="fas fa-trash-alt"></i> 삭제
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 답변 수정 폼 (기본적으로 숨겨져 있음) -->
+            <div id="editAnswerForm" class="answer-form p-4 border-top" style="display: none;">
+                <div class="alert alert-warning mb-3">
+                    <i class="fas fa-info-circle"></i>
+                    <span>답변을 수정하면 답변 시간과 관리자 정보가 업데이트됩니다.</span>
+                </div>
+                <textarea id="answerText" required th:text="${inquiry.answer}"></textarea>
+                <div class="d-flex justify-content-between align-items-center">
+                    <button type="button" id="cancelEditBtn" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> 취소
+                    </button>
+                    <button type="button" id="saveAnswerBtn" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save"></i> 답변 저장하기
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 답변 폼 -->
+        <div th:if="${inquiry.answer == null or #strings.isEmpty(inquiry.answer)}" class="answer-card">
+            <div class="answer-header" style="background-color: #ffeeee;">
+                <div class="answer-title">
+                    <i class="fas fa-reply"></i>
+                    <span>답변 등록</span>
+                </div>
+                <span class="status-badge waiting">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>미답변 상태</span>
+                </span>
+            </div>
+            <div class="answer-form">
+                <div class="alert alert-info mb-3">
+                    <i class="fas fa-info-circle"></i>
+                    <span>문의에 대한 답변을 작성하면 자동으로 답변 완료 상태로 변경됩니다.</span>
+                </div>
+                <textarea id="newAnswerText" placeholder="답변 내용을 입력하세요... 이 내용은 사용자에게 그대로 표시됩니다." required></textarea>
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted">
+                        <small><i class="fas fa-info-circle"></i> 답변 등록 시 사용자에게 알림이 전송됩니다.</small>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" id="submitAnswerBtn" class="btn btn-primary btn-lg">
+                            <i class="fas fa-paper-plane"></i> 답변 등록하기
+                        </button>
+                        <button type="button" class="btn btn-danger" id="deleteBtnMobile">
+                            <i class="fas fa-trash-alt"></i> 삭제
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="action-buttons">
+            <a th:href="@{/admin/inquiries}" class="btn btn-secondary">
+                <i class="fas fa-list"></i> 목록으로
+            </a>
+        </div>
+    </div>
+
+    <!-- 삭제 확인 모달 -->
+    <div id="myModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i>
+                    문의 삭제
+                </h3>
+                <span class="close-btn">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>정말로 이 문의를 삭제하시겠습니까?</p>
+                <p style="color: #e74c3c; font-size: 0.9rem; margin-top: 1rem;">
+                    <i class="fas fa-info-circle"></i>
+                    삭제한 문의는 복구할 수 없으며, 사용자의 문의 내역에서도 제거됩니다.
+                </p>
+                <div class="alert alert-warning" style="margin-top: 1rem; font-size: 0.9rem;">
+                    <i class="fas fa-bell"></i>
+                    <strong>참고:</strong> 문의를 삭제하기 전에 사용자에게 응답하는 것이 좋습니다.
+                    미답변 문의를 삭제하면 사용자는 답변을 받지 못합니다.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelBtn" class="btn btn-secondary">취소</button>
+                <button id="deleteConfirmBtn" class="btn btn-danger">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 드롭다운 메뉴 토글 함수
+        function toggleMenu() {
+            const dropdown = document.getElementById('dropdownMenu');
+            if (dropdown) {
+                dropdown.classList.toggle('show');
+            }
+        }
+
+        // 페이지 로드 시 hover 이벤트 추가
+        document.addEventListener('DOMContentLoaded', function () {
+            const userMenu = document.querySelector('.user-menu');
+            const dropdown = document.getElementById('dropdownMenu');
+
+            if (userMenu && dropdown) {
+                // 마우스 오버 시 드롭다운 표시
+                userMenu.addEventListener('mouseenter', function () {
+                    dropdown.classList.add('show');
+                });
+
+                // 마우스가 떠날 때 드롭다운 숨김
+                userMenu.addEventListener('mouseleave', function () {
+                    dropdown.classList.remove('show');
+                });
+            }
+        });
+        
+        // 모달 관련 요소 가져오기
+        const modal = document.getElementById("myModal");
+        const deleteBtn = document.getElementById("deleteBtn");
+        const deleteBtnMobile = document.getElementById("deleteBtnMobile");
+        const closeBtn = document.querySelector(".close-btn");
+        const cancelBtn = document.getElementById("cancelBtn");
+        const deleteConfirmBtn = document.getElementById("deleteConfirmBtn");
+
+        // 삭제 버튼 클릭 시 모달 열기 (기본)
+        if (deleteBtn) {
+            deleteBtn.onclick = function() {
+                modal.style.display = "block";
+                console.log("삭제 버튼 클릭 - 모달 열기");
+            }
+        }
+        
+        // 미답변 상태의 삭제 버튼 클릭 시 모달 열기
+        if (deleteBtnMobile) {
+            deleteBtnMobile.onclick = function() {
+                modal.style.display = "block";
+                console.log("미답변 삭제 버튼 클릭 - 모달 열기");
+            }
+        }
+
+        // X 버튼 클릭 시 모달 닫기
+        closeBtn.onclick = function() {
+            modal.style.display = "none";
+            console.log("X 버튼으로 모달 닫기");
+        }
+
+        // 취소 버튼 클릭 시 모달 닫기
+        cancelBtn.onclick = function() {
+            modal.style.display = "none";
+            console.log("취소 버튼으로 모달 닫기");
+        }
+
+        // 모달 외부 클릭 시 모달 닫기
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+                console.log("모달 외부 클릭으로 닫기");
+            }
+        }
+
+        // 삭제 확인 버튼 클릭 시 삭제 처리
+        deleteConfirmBtn.onclick = function() {
+            console.log("삭제 확인 버튼 클릭");
+            
+            // 현재 URL에서 문의 ID 추출
+            const currentUrl = window.location.pathname;
+            const inquiryId = currentUrl.split('/').pop();
+            console.log("삭제할 문의 ID:", inquiryId);
+            
+            // 폼 생성 및 제출
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/admin/inquiries/${inquiryId}/delete`;
+            document.body.appendChild(form);
+            console.log("삭제 폼 제출");
+            form.submit();
+        }
+
+        // 답변 수정 관련 스크립트
+        const editAnswerBtn = document.getElementById('editAnswerBtn');
+        const editAnswerForm = document.getElementById('editAnswerForm');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const saveAnswerBtn = document.getElementById('saveAnswerBtn');
+        const submitAnswerBtn = document.getElementById('submitAnswerBtn');
+        
+        // 현재 URL에서 ID 추출하는 함수
+        function getInquiryIdFromUrl() {
+            const currentUrl = window.location.pathname;
+            return currentUrl.split('/').pop();
+        }
+        
+        // 답변 수정 버튼 이벤트
+        if (editAnswerBtn) {
+            editAnswerBtn.onclick = function() {
+                editAnswerForm.style.display = 'block';
+                console.log("답변 수정 폼 열기");
+            }
+        }
+        
+        // 수정 취소 버튼 이벤트
+        if (cancelEditBtn) {
+            cancelEditBtn.onclick = function() {
+                editAnswerForm.style.display = 'none';
+                console.log("답변 수정 취소");
+            }
+        }
+        
+        // 답변 저장 버튼 이벤트
+        if (saveAnswerBtn) {
+            saveAnswerBtn.onclick = function() {
+                const answerText = document.getElementById('answerText').value;
+                if (!answerText.trim()) {
+                    alert('답변 내용을 입력해주세요.');
+                    return;
+                }
+                
+                const inquiryId = getInquiryIdFromUrl();
+                console.log("답변 수정 - 문의 ID:", inquiryId);
+                
+                // 폼 생성 및 제출
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/inquiries/${inquiryId}/answer`;
+                
+                // 폼 필드 추가
+                const answerInput = document.createElement('input');
+                answerInput.type = 'hidden';
+                answerInput.name = 'answer';
+                answerInput.value = answerText;
+                form.appendChild(answerInput);
+                
+                const adminIdInput = document.createElement('input');
+                adminIdInput.type = 'hidden';
+                adminIdInput.name = 'adminId';
+                adminIdInput.value = 'admin';
+                form.appendChild(adminIdInput);
+                
+                document.body.appendChild(form);
+                console.log("답변 수정 폼 제출");
+                form.submit();
+            }
+        }
+        
+        // 새 답변 등록 버튼 이벤트
+        if (submitAnswerBtn) {
+            submitAnswerBtn.onclick = function() {
+                const newAnswerText = document.getElementById('newAnswerText').value;
+                if (!newAnswerText.trim()) {
+                    alert('답변 내용을 입력해주세요.');
+                    return;
+                }
+                
+                const inquiryId = getInquiryIdFromUrl();
+                console.log("새 답변 등록 - 문의 ID:", inquiryId);
+                
+                // 폼 생성 및 제출
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/inquiries/${inquiryId}/answer`;
+                
+                // 폼 필드 추가
+                const answerInput = document.createElement('input');
+                answerInput.type = 'hidden';
+                answerInput.name = 'answer';
+                answerInput.value = newAnswerText;
+                form.appendChild(answerInput);
+                
+                const adminIdInput = document.createElement('input');
+                adminIdInput.type = 'hidden';
+                adminIdInput.name = 'adminId';
+                adminIdInput.value = 'admin';
+                form.appendChild(adminIdInput);
+                
+                document.body.appendChild(form);
+                console.log("새 답변 폼 제출");
+                form.submit();
+            }
+        }
+    </script>
+</body>
+
+</html>

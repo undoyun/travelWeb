@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ワクワク 관리자 - 활동 로그</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/admin/adminNav.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/adminMain.css}">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <style>
+        .activities-container {
+            padding: 20px;
+        }
+
+        .activity-filter {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .activity-list {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .activity-card {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+        }
+
+        .activity-card:last-child {
+            border-bottom: none;
+        }
+
+        .activity-card:hover {
+            background-color: #f9fafb;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .activity-icon.login,
+        .activity-icon.LOGIN {
+            background-color: #e3f2fd;
+            color: #0d6efd;
+        }
+
+        .activity-icon.logout,
+        .activity-icon.LOGOUT {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+
+        .activity-icon.register,
+        .activity-icon.REGISTER {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+
+        .activity-icon.review,
+        .activity-icon.REVIEW {
+            background-color: #fff8e1;
+            color: #ffa000;
+        }
+
+        .activity-icon.comment,
+        .activity-icon.COMMENT {
+            background-color: #fff3e0;
+            color: #ff9800;
+        }
+
+        .activity-icon.schedule,
+        .activity-icon.SCHEDULE {
+            background-color: #e0f7fa;
+            color: #00acc1;
+        }
+
+        .activity-icon.inquiry,
+        .activity-icon.INQUIRY {
+            background-color: #f3e5f5;
+            color: #9c27b0;
+        }
+
+        .activity-icon.profile_update,
+        .activity-icon.PROFILE_UPDATE {
+            background-color: #e8eaf6;
+            color: #3f51b5;
+        }
+
+        .activity-icon.password_change,
+        .activity-icon.PASSWORD_CHANGE {
+            background-color: #fce4ec;
+            color: #e91e63;
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: #2d3748;
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .activity-description {
+            font-size: 13px;
+            color: #4a5568;
+            margin-bottom: 8px;
+        }
+
+        .activity-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination {
+            --bs-pagination-color: #555;
+            --bs-pagination-hover-color: #333;
+            --bs-pagination-focus-color: #333;
+            --bs-pagination-active-bg: #4a6fdc;
+            --bs-pagination-active-border-color: #4a6fdc;
+        }
+
+        .activity-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .badge-login {
+            background-color: #e3f2fd;
+            color: #0d6efd;
+        }
+
+        .badge-logout {
+            background-color: #ffebee;
+            color: #f44336;
+        }
+
+        .badge-register {
+            background-color: #e8f5e9;
+            color: #4caf50;
+        }
+
+        .badge-review {
+            background-color: #fff8e1;
+            color: #ffa000;
+        }
+
+        .badge-comment {
+            background-color: #fff3e0;
+            color: #ff9800;
+        }
+
+        .badge-schedule {
+            background-color: #e0f7fa;
+            color: #00acc1;
+        }
+
+        .badge-inquiry {
+            background-color: #f3e5f5;
+            color: #9c27b0;
+        }
+
+        .badge-profile {
+            background-color: #e8eaf6;
+            color: #3f51b5;
+        }
+
+        .badge-password {
+            background-color: #fce4ec;
+            color: #e91e63;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: #a0aec0;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .empty-state h4 {
+            font-weight: 600;
+            color: #718096;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            text-align: center;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 상단 네비게이션 바 포함 -->
+    <div th:replace="~{admin/adminNav :: adminTopNav}"></div>
+
+    <div class="wrapper">
+        <!-- 메인 컨텐츠 영역 -->
+        <div class="main-content">
+            <div class="activities-container">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">활동 로그</h2>
+                    <div>
+                        <button id="refreshActivities" class="btn btn-primary">
+                            <i class="fas fa-sync-alt me-2"></i>새로고침
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 필터 섹션 -->
+                <div class="activity-filter mb-4">
+                    <form id="filterForm" method="get" th:action="@{/admin/activity-logs}">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label for="activityType" class="form-label">활동 유형</label>
+                                <select class="form-select" id="activityType" name="activityType">
+                                    <option value="">전체</option>
+                                    <option value="LOGIN">로그인</option>
+                                    <option value="LOGOUT">로그아웃</option>
+                                    <option value="REGISTER">회원가입</option>
+                                    <option value="REVIEW">리뷰</option>
+                                    <option value="COMMENT">댓글</option>
+                                    <option value="SCHEDULE">일정</option>
+                                    <option value="INQUIRY">문의</option>
+                                    <option value="PROFILE_UPDATE">프로필 수정</option>
+                                    <option value="PASSWORD_CHANGE">비밀번호 변경</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label for="userId" class="form-label">사용자 ID</label>
+                                <input type="text" class="form-control" id="userId" name="userId" placeholder="사용자 ID">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="startDate" class="form-label">시작 날짜</label>
+                                <input type="date" class="form-control" id="startDate" name="startDate">
+                            </div>
+                            <div class="col-md-3">
+                                <label for="endDate" class="form-label">종료 날짜</label>
+                                <input type="date" class="form-control" id="endDate" name="endDate">
+                            </div>
+                            <div class="col-12 d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary me-2">필터 적용</button>
+                                <button type="reset" class="btn btn-outline-secondary">초기화</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 활동 로그 목록 -->
+                <div class="activity-list">
+                    <!-- 활동 로그가 없을 경우 -->
+                    <div th:if="${activitiesPage.empty}" class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h4>활동 로그가 없습니다</h4>
+                        <p>선택한 필터에 해당하는 활동 로그가 없습니다. 다른 필터를 선택하거나 필터를 초기화해보세요.</p>
+                        <button onclick="document.getElementById('filterForm').reset()" class="btn btn-outline-primary">
+                            필터 초기화
+                        </button>
+                    </div>
+
+                    <!-- 활동 로그 카드 -->
+                    <div th:each="activity : ${activitiesPage.content}" class="activity-card">
+                        <div th:class="'activity-icon ' + ${activity.activityType.name()}">
+                            <i th:class="${
+                                activity.activityType.name() == 'LOGIN' ? 'fas fa-sign-in-alt' : 
+                                activity.activityType.name() == 'LOGOUT' ? 'fas fa-sign-out-alt' : 
+                                activity.activityType.name() == 'REGISTER' ? 'fas fa-user-plus' :
+                                activity.activityType.name() == 'REVIEW' ? 'fas fa-comment' : 
+                                activity.activityType.name() == 'COMMENT' ? 'fas fa-comments' :
+                                activity.activityType.name() == 'SCHEDULE' ? 'fas fa-calendar-alt' :
+                                activity.activityType.name() == 'INQUIRY' ? 'fas fa-question-circle' :
+                                activity.activityType.name() == 'PROFILE_UPDATE' ? 'fas fa-user-edit' :
+                                activity.activityType.name() == 'PASSWORD_CHANGE' ? 'fas fa-key' :
+                                'fas fa-info-circle'
+                            }"></i>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-header">
+                                <span class="user-name" th:text="${activity.userName}">사용자</span>
+                                <span class="activity-time"
+                                    th:text="${#temporals.format(activity.createdAt, 'yyyy-MM-dd HH:mm:ss')}">2023-04-10
+                                    12:34:56</span>
+                            </div>
+                            <div class="activity-description" th:text="${activity.description}">
+                                활동 설명
+                            </div>
+                            <div class="activity-meta">
+                                <div>
+                                    <span
+                                        th:class="'activity-badge badge-' + ${#strings.toLowerCase(activity.activityType.name())}"
+                                        th:text="${activity.activityType.getDisplayName()}">로그인</span>
+                                    <span th:if="${activity.targetId != null && activity.targetType != null}">
+                                        <a th:href="@{'/admin/' + ${activity.targetType} + 's/' + ${activity.targetId}}"
+                                            class="ms-2 link-primary text-decoration-none">
+                                            <small>관련 항목 보기</small>
+                                        </a>
+                                    </span>
+                                </div>
+                                <div th:if="${activity.ipAddress != null}">
+                                    <span class="text-muted">
+                                        <i class="fas fa-globe me-1"></i>
+                                        <span th:text="${activity.ipAddress}">127.0.0.1</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 페이지네이션 -->
+                <div th:if="${!activitiesPage.empty}" class="pagination-container">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <!-- 이전 페이지 버튼 -->
+                            <li class="page-item" th:classappend="${!activitiesPage.hasPrevious()} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/activity-logs(page=${activitiesPage.number - 1})}"
+                                    aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+
+                            <!-- 페이지 번호 -->
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, activitiesPage.totalPages - 1)}"
+                                th:classappend="${i == activitiesPage.number} ? 'active'">
+                                <a class="page-link" th:href="@{/admin/activity-logs(page=${i})}"
+                                    th:text="${i + 1}">1</a>
+                            </li>
+
+                            <!-- 다음 페이지 버튼 -->
+                            <li class="page-item" th:classappend="${!activitiesPage.hasNext()} ? 'disabled'">
+                                <a class="page-link"
+                                    th:href="@{/admin/activity-logs(page=${activitiesPage.number + 1})}"
+                                    aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.3/build/global/luxon.min.js"></script>
+    <script th:src="@{/js/main/nav.js}"></script>
+    <script>
+        // 새로고침 버튼 이벤트 리스너
+        document.getElementById('refreshActivities').addEventListener('click', function () {
+            this.innerHTML = '<i class="fas fa-sync-alt fa-spin me-2"></i>새로고침 중...';
+            this.disabled = true;
+
+            // 페이지 새로고침
+            window.location.reload();
+        });
+
+        // 날짜 필드 초기값 설정
+        document.addEventListener('DOMContentLoaded', function () {
+            // URL 파라미터에서 필터 값을 가져와서 설정
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // 활동 유형 선택
+            if (urlParams.has('activityType')) {
+                document.getElementById('activityType').value = urlParams.get('activityType');
+            }
+
+            // 사용자 ID
+            if (urlParams.has('userId')) {
+                document.getElementById('userId').value = urlParams.get('userId');
+            }
+
+            // 날짜 범위
+            if (urlParams.has('startDate')) {
+                document.getElementById('startDate').value = urlParams.get('startDate');
+            }
+
+            if (urlParams.has('endDate')) {
+                document.getElementById('endDate').value = urlParams.get('endDate');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부산 관광 명소 - ワクワク</title>
+    <link rel="stylesheet" href="/css/main/main.css">
+    <link rel="stylesheet" href="/css/main/nav.css">
+    <link rel="stylesheet" href="/css/attractions/attractionList.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- 네비게이션 바 포함 -->
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <div class="attractions-container">
+        <div class="main-header">
+            <h1 class="main-title">부산 어디로 여행을 떠나시나요?</h1>
+            <p class="main-description">부산의 명소를 검색하고 찾아보세요.</p>
+        </div>
+
+        <!-- 검색 컨테이너 -->
+        <div class="search-container">
+            <form class="search-form"
+                th:action="${gugunNm != null} ? @{/attractions/gugun/{gugunNm}(gugunNm=${gugunNm})} : @{/attractions}"
+                method="get">
+                <input type="text" name="keyword" class="search-input" th:value="${keyword}"
+                    placeholder="부산 관광 명소를 검색해보세요.">
+                <button type="submit" class="search-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </form>
+        </div>
+
+        <!-- 탭 메뉴 (부산 관련 카테고리로 변경) -->
+        <div class="tab-container">
+            <div class="tab active">전체 명소</div>
+            <div class="tab">인기 명소</div>
+            <div class="tab">최근 추가</div>
+        </div>
+
+        <!-- 구군별 필터 (더 강조) -->
+        <div class="filters">
+            <a href="/attractions" class="filter-btn" th:classappend="${gugunNm == null} ? 'active' : ''">전체</a>
+            <a href="/attractions/gugun/중구" class="filter-btn"
+                th:classappend="${gugunNm == '중구'} ? 'active' : ''">중구</a>
+            <a href="/attractions/gugun/서구" class="filter-btn"
+                th:classappend="${gugunNm == '서구'} ? 'active' : ''">서구</a>
+            <a href="/attractions/gugun/동구" class="filter-btn"
+                th:classappend="${gugunNm == '동구'} ? 'active' : ''">동구</a>
+            <a href="/attractions/gugun/영도구" class="filter-btn"
+                th:classappend="${gugunNm == '영도구'} ? 'active' : ''">영도구</a>
+            <a href="/attractions/gugun/부산진구" class="filter-btn"
+                th:classappend="${gugunNm == '부산진구'} ? 'active' : ''">부산진구</a>
+            <a href="/attractions/gugun/동래구" class="filter-btn"
+                th:classappend="${gugunNm == '동래구'} ? 'active' : ''">동래구</a>
+            <a href="/attractions/gugun/남구" class="filter-btn"
+                th:classappend="${gugunNm == '남구'} ? 'active' : ''">남구</a>
+            <a href="/attractions/gugun/북구" class="filter-btn"
+                th:classappend="${gugunNm == '북구'} ? 'active' : ''">북구</a>
+            <a href="/attractions/gugun/해운대구" class="filter-btn"
+                th:classappend="${gugunNm == '해운대구'} ? 'active' : ''">해운대구</a>
+            <a href="/attractions/gugun/사하구" class="filter-btn"
+                th:classappend="${gugunNm == '사하구'} ? 'active' : ''">사하구</a>
+            <a href="/attractions/gugun/금정구" class="filter-btn"
+                th:classappend="${gugunNm == '금정구'} ? 'active' : ''">금정구</a>
+            <a href="/attractions/gugun/강서구" class="filter-btn"
+                th:classappend="${gugunNm == '강서구'} ? 'active' : ''">강서구</a>
+            <a href="/attractions/gugun/연제구" class="filter-btn"
+                th:classappend="${gugunNm == '연제구'} ? 'active' : ''">연제구</a>
+            <a href="/attractions/gugun/수영구" class="filter-btn"
+                th:classappend="${gugunNm == '수영구'} ? 'active' : ''">수영구</a>
+            <a href="/attractions/gugun/사상구" class="filter-btn"
+                th:classappend="${gugunNm == '사상구'} ? 'active' : ''">사상구</a>
+            <a href="/attractions/gugun/기장군" class="filter-btn"
+                th:classappend="${gugunNm == '기장군'} ? 'active' : ''">기장군</a>
+        </div>
+
+        <!-- 현재 선택된 구/군 표시 -->
+        <div class="current-district" th:if="${gugunNm != null}">
+            <h2><span th:text="${gugunNm}">구/군</span> 관광 명소</h2>
+        </div>
+        <div class="current-district" th:if="${gugunNm == null}">
+            <h2>부산 전체 관광 명소</h2>
+        </div>
+
+        <!-- 검색 결과 표시 -->
+        <div class="search-result" th:if="${keyword != null && !keyword.isEmpty()}">
+            <p>"<span th:text="${keyword}"></span>" 검색 결과: <span th:text="${attractionsPage.totalElements}"></span>개의 관광
+                명소</p>
+        </div>
+
+        <!-- 관광 명소 목록 (페이징 적용) -->
+        <div class="attractions-grid" th:if="${attractionsPage != null && !attractionsPage.empty}">
+            <div class="attraction-card" th:each="attraction, status : ${attractionsPage.content}">
+                <a th:href="@{/attractions/{id}(id=${attraction.id})}">
+                    <img class="attraction-image" th:src="${attraction.mainImgThumb}" th:alt="${attraction.mainTitle}"
+                        onerror="this.src='/img/no-image.jpg'">
+                    <div class="attraction-info">
+                        <div class="attraction-title" th:text="${attraction.mainTitle}">관광 명소 이름</div>
+                        <div class="attraction-location" th:text="${attraction.gugunNm}">지역</div>
+                    </div>
+                    <!-- 최근 추가된 항목에 NEW 태그 추가 (예시: 첫 3개 항목) -->
+                    <div class="new-tag" th:if="${status.index < 3}">NEW</div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 관광 명소가 없을 경우 -->
+        <div class="no-attractions" th:if="${attractionsPage == null || attractionsPage.empty}">
+            <p>등록된 관광 명소가 없습니다.</p>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination" th:if="${attractionsPage != null && attractionsPage.totalPages > 1}">
+            <!-- 이전 페이지 링크 -->
+            <a th:if="${attractionsPage.hasPrevious()}"
+                th:href="@{${gugunNm != null ? '/attractions/gugun/' + gugunNm : '/attractions'}(page=${attractionsPage.number - 1}, size=${attractionsPage.size}, keyword=${keyword})}"
+                aria-label="Previous">
+                &laquo;
+            </a>
+            <span th:unless="${attractionsPage.hasPrevious()}" class="disabled">&laquo;</span>
+
+            <!-- 페이지 번호 -->
+            <th:block th:each="i : ${#numbers.sequence(0, attractionsPage.totalPages - 1)}">
+                <a th:if="${i >= attractionsPage.number - 2 && i <= attractionsPage.number + 2}"
+                    th:href="@{${gugunNm != null ? '/attractions/gugun/' + gugunNm : '/attractions'}(page=${i}, size=${attractionsPage.size}, keyword=${keyword})}"
+                    th:text="${i + 1}" th:class="${i == attractionsPage.number} ? 'active' : ''">
+                </a>
+            </th:block>
+
+            <!-- 다음 페이지 링크 -->
+            <a th:if="${attractionsPage.hasNext()}"
+                th:href="@{${gugunNm != null ? '/attractions/gugun/' + gugunNm : '/attractions'}(page=${attractionsPage.number + 1}, size=${attractionsPage.size}, keyword=${keyword})}"
+                aria-label="Next">
+                &raquo;
+            </a>
+            <span th:unless="${attractionsPage.hasNext()}" class="disabled">&raquo;</span>
+        </div>
+    </div>
+
+    <script>
+        // 필터 버튼 활성화 스크립트
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentPath = window.location.pathname;
+            const filterBtns = document.querySelectorAll('.filter-btn');
+
+            filterBtns.forEach(btn => {
+                const btnPath = btn.getAttribute('href').split('?')[0]; // 쿼리 파라미터 제외
+                if (btnPath === currentPath) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // 탭 클릭 이벤트
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function () {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+    </script>
+    <script th:src="@{/js/main/nav.js}"></script>
+</body>
+
+</html>

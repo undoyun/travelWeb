@@ -1,0 +1,37 @@
+# 현재 브랜치에서 develop 브랜치 생성
+git checkout -b develop
+
+# 원격 저장소에 develop 브랜치 푸시
+git push origin develop
+
+# 원격 저장소 클론
+1. git clone <원격 저장소 URL>
+
+# 원격 저장소 develop 브랜치 체크아웃
+git checkout develop
+
+# 원격 저장소 develop 브랜치 최신 상태 가져오기
+git pull origin develop
+
+# 기능 브랜치 생성
+git checkout -b feature/이름
+
+# 원격 저장소에 기능 브랜치 푸시
+git push origin feature/이름
+# @주의 사항: 반드시 기능 브랜치에서 작업 후 커밋 후 푸시 해야 github에 반영됨
+
+# 작업 후 변경 사항 커밋
+git add .
+git commit -m "기능 추가: 로그인 기능 구현"
+
+# 자신의 브랜치 푸시
+git push origin feature/이름
+
+# 원격 저장소에서 develop 브랜치 삭제
+git push origin --delete develop
+
+git add src/main/resources/application-oauth.yml
+git commit --amend --no-edit
+
+
+

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ワクワク: 로그인</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <link rel="stylesheet" href="/css/users/login.css">
+    <style>
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .modal-subtitle {
+            font-size: 16px;
+            margin-bottom: 25px;
+            text-align: center;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-group.error input {
+            border-color: #ff5252;
+        }
+
+        .error-message {
+            color: #ff5252;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .btn-modal-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #4a69bd;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn-modal-submit:hover {
+            background-color: #3c58a8;
+        }
+    </style>
+</head>
+
+<body>
+    <form class="login-container" action="/users/login" method="post" th:object="${user}">
+        <div class="logo">ワクワク</div>
+        <p class="subtitle">부산 여행의 모든 것, AI 여행 플래너로 간편하게</p>
+
+        <div class="login-tabs">
+            <div class="login-tab active">로그인</div>
+        </div>
+
+        <input type="text" th:field="*{username}" placeholder="아이디 또는 전화번호" required>
+        <input type="password" th:field="*{password}" placeholder="비밀번호" required>
+
+        <button type="submit" class="btn-login">로그인</button>
+
+        <div class="divider">또는</div>
+
+        <div class="social-login">
+            <button class="social-login-button" type="button" onclick="location.href='/oauth2/authorization/google'">
+                <i class="fab fa-google"></i> 구글 계정으로 로그인
+            </button>
+        </div>
+
+        <div>
+            <a href="/users/register" class="register-link">아직 계정이 없으신가요? 회원가입</a>
+            <a href="/" class="back-to-home"><i class="fas fa-arrow-left"></i> 메인으로 돌아가기</a>
+        </div>
+    </form>
+
+    <!-- 소셜 로그인 추가 정보 입력 모달 -->
+    <div id="addInfoModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">추가 정보 입력</h2>
+            <p class="modal-subtitle">회원가입을 완료하려면 아래 정보를 입력해주세요.</p>
+
+            <form id="addInfoForm">
+                <div class="form-group">
+                    <label for="nickname">닉네임</label>
+                    <input type="text" id="nickname" name="nickname" required>
+                    <div class="error-message" id="nickname-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">성별</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">선택하세요</option>
+                        <option value="MALE">남성</option>
+                        <option value="FEMALE">여성</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthdate">생년월일</label>
+                    <input type="date" id="birthdate" name="birthdate" required>
+                </div>
+
+                <div class="error-message" id="form-error" style="text-align: center; margin: 10px 0;"></div>
+                <button type="button" id="submitInfoBtn" class="btn-modal-submit">가입 완료</button>
+            </form>
+        </div>
+    </div>
+</body>
+<script>
+    // URL 파라미터에서 showModal 값을 확인하여 모달을 표시
+    document.addEventListener('DOMContentLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('showModal') === 'true') {
+            document.getElementById('addInfoModal').style.display = 'flex';
+        }
+
+        // 닉네임 중복 체크
+        document.getElementById('nickname').addEventListener('blur', function () {
+            const nickname = this.value;
+            if (nickname) {
+                fetch(`/api/users/check-nickname?nickname=${nickname}`)
+                    .then(response => response.text())
+                    .then(message => {
+                        const errorElement = document.getElementById('nickname-error');
+                        if (message === '사용 가능한 닉네임입니다.') {
+                            errorElement.style.display = 'none';
+                            this.parentElement.classList.remove('error');
+                        } else {
+                            errorElement.textContent = message;
+                            errorElement.style.display = 'block';
+                            this.parentElement.classList.add('error');
+                        }
+                    });
+            }
+        });
+
+        // 폼 제출 처리 (Ajax)
+        document.getElementById('submitInfoBtn').addEventListener('click', function () {
+            const nickname = document.getElementById('nickname').value;
+            const gender = document.getElementById('gender').value;
+            const birthdate = document.getElementById('birthdate').value;
+
+            let isValid = true;
+
+            if (!nickname) {
+                document.getElementById('nickname-error').textContent = '닉네임을 입력해주세요.';
+                document.getElementById('nickname-error').style.display = 'block';
+                document.getElementById('nickname').parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (!gender) {
+                const genderError = document.createElement('div');
+                genderError.textContent = '성별을 선택해주세요.';
+                genderError.className = 'error-message';
+                genderError.style.display = 'block';
+
+                // 기존 에러 메시지 제거
+                const existingError = document.getElementById('gender-error');
+                if (existingError) {
+                    existingError.remove();
+                }
+
+                genderError.id = 'gender-error';
+                document.getElementById('gender').parentElement.appendChild(genderError);
+                document.getElementById('gender').parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (!birthdate) {
+                const birthdateError = document.createElement('div');
+                birthdateError.textContent = '생년월일을 입력해주세요.';
+                birthdateError.className = 'error-message';
+                birthdateError.style.display = 'block';
+
+                // 기존 에러 메시지 제거
+                const existingError = document.getElementById('birthdate-error');
+                if (existingError) {
+                    existingError.remove();
+                }
+
+                birthdateError.id = 'birthdate-error';
+                document.getElementById('birthdate').parentElement.appendChild(birthdateError);
+                document.getElementById('birthdate').parentElement.classList.add('error');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                return;
+            }
+
+            // Ajax로 서버에 데이터 전송
+            const formData = new FormData();
+            formData.append('nickname', nickname);
+            formData.append('gender', gender); // 'MALE' 또는 'FEMALE' 값이 전송됨
+            formData.append('birthdate', birthdate);
+
+            fetch('/api/users/add-info', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 성공 시 리다이렉트
+                        window.location.href = data.redirectUrl;
+                    } else {
+                        // 실패 시 에러 메시지 표시
+                        document.getElementById('form-error').textContent = data.message;
+                        document.getElementById('form-error').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('에러:', error);
+                    document.getElementById('form-error').textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+                    document.getElementById('form-error').style.display = 'block';
+                });
+        });
+    });
+</script>
+
+</html>

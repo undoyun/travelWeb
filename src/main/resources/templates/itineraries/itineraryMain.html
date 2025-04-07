@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>ワクワク:부산 여행 플래너</title>
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/itineraries/itineraryMain.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <!-- 히어로 섹션 -->
+    <section class="hero">
+        <div class="hero-text">
+            <h1>
+                부산 여행, 더 쉽고 특별하게<br>
+                AI 플래너와 함께 완벽한 부산 여행을 계획하세요!
+            </h1>
+            <p>
+                복잡한 부산 여행 계획, <b>ワクワク</b>와 함께<br>
+                단 몇 분 만에 나만의 부산 여행 코스 완성!
+            </p>
+            <button id="openModalBtn" class="start-btn" onclick="window.location.href='/itineraries/itineraryCreate'">부산
+                여행 계획 시작하기</button>
+        </div>
+
+        <div class="hero-image">
+            <img th:src="@{/img/itineraries/bridge.jpeg}" alt="부산 광안대교">
+        </div>
+    </section>
+
+    <!-- 부산 지역 소개 섹션 -->
+    <section class="busan-districts">
+        <div class="section-title">
+            <h2>부산의 매력적인 구/군</h2>
+            <p>각 지역별 특색 있는 관광 명소를 만나보세요</p>
+        </div>
+
+        <div class="districts-container">
+            <div class="district-card">
+                <img th:src="@{/img/itineraries/haeundae.jpeg}" alt="해운대구">
+                <div class="district-info">
+                    <h3>해운대구</h3>
+                    <p>해운대 해수욕장, 동백섬, 마린시티 등 부산의 대표 관광지</p>
+                    <a href="/attractions/gugun/해운대구" class="view-more">해운대구 명소 보기 →</a>
+                </div>
+            </div>
+
+            <div class="district-card">
+                <img th:src="@{/img/itineraries/suyeong.png}" alt="수영구">
+                <div class="district-info">
+                    <h3>수영구</h3>
+                    <p>광안리 해수욕장, 광안대교의 아름다운 야경을 감상할 수 있는 지역</p>
+                    <a href="/attractions/gugun/수영구" class="view-more">수영구 명소 보기 →</a>
+                </div>
+            </div>
+
+            <div class="district-card">
+                <img th:src="@{/img/itineraries/jung.jpeg}" alt="중구">
+                <div class="district-info">
+                    <h3>중구</h3>
+                    <p>국제시장, 자갈치시장, 용두산공원 등 부산의 전통과 역사가 살아있는 곳</p>
+                    <a href="/attractions/gugun/중구" class="view-more">중구 명소 보기 →</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="view-all-districts">
+            <a href="/attractions" class="view-all-btn">모든 구/군 보기</a>
+        </div>
+    </section>
+
+    <!-- 부산 여행 테마 섹션 -->
+    <section class="busan-themes">
+        <div class="section-title">
+            <h2>부산 여행 테마</h2>
+            <p>취향에 맞는 부산 여행 테마를 선택해보세요</p>
+        </div>
+
+        <div class="themes-container">
+            <div class="theme-card">
+                <div class="theme-icon">
+                    <i class="fas fa-umbrella-beach"></i>
+                </div>
+                <h3>해변 여행</h3>
+                <p>해운대, 광안리, 송정 등 부산의 아름다운 해변을 중심으로 한 여행 코스</p>
+                <a href="/attractions" class="theme-btn">해변 코스 만들기</a>
+            </div>
+
+            <div class="theme-card">
+                <div class="theme-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h3>맛집 탐방</h3>
+                <p>부산의 대표 먹거리와 숨겨진 맛집을 찾아 떠나는 미식 여행</p>
+                <a href="/attractions" class="theme-btn">맛집 코스 만들기</a>
+            </div>
+
+            <div class="theme-card">
+                <div class="theme-icon">
+                    <i class="fas fa-camera"></i>
+                </div>
+                <h3>인생샷 명소</h3>
+                <p>SNS에서 인기 있는 부산의 포토 스팟을 중심으로 한 여행 코스</p>
+                <a href="/attractions" class="theme-btn">포토 코스 만들기</a>
+            </div>
+
+            <div class="theme-card">
+                <div class="theme-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3>역사 탐방</h3>
+                <p>부산의 역사와 문화를 느낄 수 있는 유적지와 박물관 중심 코스</p>
+                <a href="/attractions" class="theme-btn">역사 코스 만들기</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 부산 여행 꿀팁 섹션 -->
+    <section class="busan-tips">
+        <div class="section-title">
+            <h2>부산 여행 꿀팁</h2>
+            <p>현지인이 알려주는 부산 여행 노하우</p>
+        </div>
+
+        <div class="tips-container">
+            <div class="tip-item">
+                <div class="tip-number">01</div>
+                <div class="tip-content">
+                    <h3>교통 꿀팁</h3>
+                    <p>부산 시티투어 버스를 이용하면 주요 관광지를 편리하게 둘러볼 수 있어요. 하루 이용권으로 자유롭게 타고 내릴 수 있습니다.</p>
+                </div>
+            </div>
+
+            <div class="tip-item">
+                <div class="tip-number">02</div>
+                <div class="tip-content">
+                    <h3>맛집 꿀팁</h3>
+                    <p>자갈치시장은 오전에 방문하는 것이 좋아요. 신선한 해산물을 맛볼 수 있고, 사람도 적어 여유롭게 구경할 수 있습니다.</p>
+                </div>
+            </div>
+
+            <div class="tip-item">
+                <div class="tip-number">03</div>
+                <div class="tip-content">
+                    <h3>숙소 꿀팁</h3>
+                    <p>해운대나 광안리에 숙소를 잡으면 바다 뷰와 함께 편리한 교통을 모두 누릴 수 있어요. 특히 야경을 즐기기에 최적의 위치입니다.</p>
+                </div>
+            </div>
+
+            <div class="tip-item">
+                <div class="tip-number">04</div>
+                <div class="tip-content">
+                    <h3>쇼핑 꿀팁</h3>
+                    <p>남포동과 서면은 쇼핑의 천국이에요. 로컬 브랜드부터 유명 브랜드까지 다양한 쇼핑을 즐길 수 있습니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 부산 여행 후기 섹션 -->
+    <section class="testimonials">
+        <div class="section-title">
+            <h2>부산 여행자들의 후기</h2>
+            <p>ワクワク와 함께한 부산 여행 이야기</p>
+        </div>
+
+        <div class="testimonials-container">
+            <!-- 데이터베이스에서 가져온 실제 리뷰 표시 -->
+            <div th:each="review : ${topReviews}" class="testimonial-card">
+                <div class="testimonial-profile">
+                    <div class="testimonial-avatar" th:text="${#strings.substring(review.userName, 0, 1)}">김</div>
+                    <div>
+                        <h4 th:text="${review.userName}">사용자</h4>
+                        <p th:text="${review.destination}">여행지</p>
+                    </div>
+                </div>
+                <p class="testimonial-text" th:text="${#strings.abbreviate(review.content, 150)}">리뷰 내용입니다...</p>
+                <div class="testimonial-rating">
+                    <i th:each="i : ${#numbers.sequence(1, review.rating)}" class="fas fa-star"></i>
+                    <i th:each="i : ${#numbers.sequence(review.rating + 1, 5)}" class="far fa-star"></i>
+                </div>
+                <a th:href="@{/reviews/{id}(id=${review.id})}" class="view-review-btn">리뷰 보기</a>
+            </div>
+            
+            <!-- 인기 리뷰가 없는 경우 기본 리뷰 표시 -->
+            <div th:if="${topReviews == null || topReviews.empty}" class="testimonial-card">
+                <div class="testimonial-profile">
+                    <img th:src="@{/img/plan/user1.jpg}" alt="사용자 1">
+                    <div>
+                        <h4>김지민</h4>
+                        <p>해운대구 여행</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">"AI가 추천해준 일정 덕분에 해운대의 모든 명소를 효율적으로 둘러볼 수 있었어요. 특히 동백섬에서 본 일몰은 정말 잊을 수 없는
+                    경험이었습니다!"</p>
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+
+            <div th:if="${topReviews == null || topReviews.size() < 2}" class="testimonial-card">
+                <div class="testimonial-profile">
+                    <img th:src="@{/img/plan/user2.jpg}" alt="사용자 2">
+                    <div>
+                        <h4>이현우</h4>
+                        <p>광안리 여행</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">"가족 여행으로 광안리를 방문했는데, ワクワク가 추천해준 코스 덕분에 아이들도 즐겁게 여행할 수 있었어요. 특히 광안대교의 야경은 정말
+                    환상적이었습니다."</p>
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                </div>
+            </div>
+
+            <div th:if="${topReviews == null || topReviews.size() < 3}" class="testimonial-card">
+                <div class="testimonial-profile">
+                    <img th:src="@{/img/plan/user3.jpg}" alt="사용자 3">
+                    <div>
+                        <h4>박서연</h4>
+                        <p>남포동 여행</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">"혼자 부산 여행을 했는데, ワクワク 덕분에 안전하고 즐거운 여행을 할 수 있었어요. 특히 국제시장과 자갈치시장의 맛집 추천이 정말
+                    좋았습니다!"</p>
+                <div class="testimonial-rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA 섹션 -->
+    <section class="cta">
+        <div class="cta-content">
+            <h2>지금 바로 부산 여행 계획을 시작해보세요!</h2>
+            <p>단 몇 분 만에 완벽한 부산 여행 일정이 완성됩니다.</p>
+            <button onclick="window.location.href='/itineraries/itineraryCreate'" class="cta-btn">부산 여행 계획 만들기</button>
+        </div>
+    </section>
+
+    <script th:src="@{/js/main/main.js}"></script>
+    <script th:src="@{/js/main/nav.js}"></script>
+</body>
+
+</html>

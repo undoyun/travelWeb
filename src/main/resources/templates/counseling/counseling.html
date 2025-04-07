@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ワクワク: 문의 내역</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <link rel="stylesheet" th:href="@{/css/counseling/list.css}">
+</head>
+<style>
+    :root {
+        --primary: #4a90e2;
+        --primary-hover: #357abd;
+        --primary-light: #e6f4ff;
+        --secondary: #6c757d;
+        --success: #28a745;
+        --danger: #dc3545;
+        --warning: #ffc107;
+        --info: #17a2b8;
+        --light: #f8f9fa;
+        --dark: #343a40;
+        --border: #e9ecef;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        --shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        font-family: 'Noto Sans KR', sans-serif;
+        background-color: #f8f9fa;
+        color: var(--dark);
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    .page-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    /* 헤더 섹션 */
+    .header-section {
+        margin-bottom: 2rem;
+    }
+
+    /* 서포트 헤더 */
+    .support-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 20px;
+        padding: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .support-content {
+        flex: 1;
+        position: relative;
+        z-index: 2;
+    }
+
+    .support-text h1 {
+        font-size: 2.5rem;
+        color: #333;
+        margin: 0;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+
+    .support-text p {
+        font-size: 1.1rem;
+        color: #666;
+        margin: 1rem 0 2rem 0;
+        max-width: 600px;
+    }
+
+    .support-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .support-image {
+        font-size: 8rem;
+        color: rgba(74, 144, 226, 0.1);
+        position: absolute;
+        right: 2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 1;
+    }
+
+    /* 통계 카드 */
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+
+    /* 통계 카드 */
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .stat-icon i {
+        font-size: 1.25rem;
+        color: white;
+    }
+
+    .stat-icon.waiting {
+        background: linear-gradient(135deg, #ffd93d 0%, #ff9f43 100%);
+    }
+
+    .stat-icon.completed {
+        background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+    }
+
+    .stat-icon.total {
+        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    }
+
+    .stat-info h3 {
+        font-size: 0.875rem;
+        color: #666;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    .stat-info .stat-number {
+        font-size: 1.5rem;
+        color: #333;
+        font-weight: 600;
+        margin: 0.25rem 0 0 0;
+    }
+
+    /* 액션 카드 */
+    .action-card {
+        background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+        border-radius: 16px;
+        padding: 1.5rem;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.2);
+    }
+
+    .action-card h3 {
+        font-size: 1.25rem;
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .action-card p {
+        margin: 0.5rem 0 1.25rem 0;
+        opacity: 0.9;
+        font-size: 0.9rem;
+    }
+
+    /* 버튼 스타일 */
+    .create-inquiry-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.875rem 1.5rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        gap: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .create-inquiry-btn.primary {
+        background-color: #4a90e2;
+        color: white;
+    }
+
+    .create-inquiry-btn.primary:hover {
+        background-color: #357abd;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(74, 144, 226, 0.2);
+    }
+
+    .create-inquiry-btn.secondary {
+        background-color: white;
+        color: #4a90e2;
+        border: 2px solid #4a90e2;
+    }
+
+    .create-inquiry-btn.secondary:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .create-inquiry-btn i {
+        font-size: 1rem;
+    }
+
+    /* 알림 메시지 */
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .alert i {
+        margin-right: 0.5rem;
+    }
+
+    .alert-success {
+        background-color: #e3f9e5;
+        color: #1c7c4c;
+        border: 1px solid #a3e9c6;
+    }
+
+    .alert-danger {
+        background-color: #ffe3e3;
+        color: #c92a2a;
+        border: 1px solid #ffa8a8;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.3s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* 문의 카드 목록 */
+    .inquiry-list {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        margin-bottom: 1.5rem;
+    }
+
+    .list-header {
+        display: grid;
+        grid-template-columns: 100px 120px 1fr 120px;
+        padding: 1.25rem;
+        background-color: #fff;
+        border-bottom: 1px solid var(--border);
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .header-item {
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .header-item.title {
+        text-align: left;
+        padding-left: 1rem;
+    }
+
+    .inquiry-item {
+        display: grid;
+        grid-template-columns: 100px 120px 1fr 120px;
+        padding: 1.25rem;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+    }
+
+    .inquiry-item:hover {
+        background-color: var(--primary-light);
+    }
+
+    .inquiry-item:last-child {
+        border-bottom: none;
+    }
+
+    .item-status {
+        text-align: center;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 0.375rem 0.875rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-align: center;
+    }
+
+    .status-badge.waiting {
+        background-color: #fff3bf;
+        color: #f08c00;
+    }
+
+    .status-badge.answered {
+        background-color: #d3f9d8;
+        color: #2b8a3e;
+    }
+
+    .item-category {
+        text-align: center;
+        color: var(--dark);
+        font-size: 0.9rem;
+    }
+
+    .item-title {
+        padding: 0 1rem;
+        color: var(--dark);
+        font-size: 0.9rem;
+    }
+
+    .item-date {
+        text-align: center;
+        color: var(--secondary);
+        font-size: 0.9rem;
+    }
+
+    /* 하단 버튼 영역 */
+    .bottom-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 1.5rem 0;
+    }
+
+    .write-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        background-color: var(--primary);
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 500;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow);
+    }
+
+    .write-btn:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .faq-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.75rem 1.5rem;
+        color: var(--dark);
+        text-decoration: none;
+        gap: 0.75rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border);
+        background-color: #fff;
+        box-shadow: var(--shadow);
+    }
+
+    .faq-btn:hover {
+        background-color: var(--primary-light);
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    /* 페이지네이션 */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 2rem;
+        gap: 0.5rem;
+    }
+
+    .page-numbers {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .page-number,
+    .page-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2.5rem;
+        height: 2.5rem;
+        padding: 0 0.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--dark);
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        background-color: #fff;
+        border: 1px solid var(--border);
+    }
+
+    .page-number:hover,
+    .page-btn:hover {
+        background-color: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .page-number.active {
+        background-color: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    /* 빈 상태 */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+    }
+
+    .empty-state-content i {
+        font-size: 3.5rem;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        opacity: 0.8;
+    }
+
+    .empty-state-content h3 {
+        color: var(--dark);
+        margin: 0 0 1rem 0;
+        font-size: 1.5rem;
+    }
+
+    .empty-state-content p {
+        color: var(--secondary);
+        margin-bottom: 2rem;
+        font-size: 1rem;
+    }
+
+    .empty-state-btn {
+        background: linear-gradient(135deg, #4A90E2, #357ABD);
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(74, 144, 226, 0.2);
+        margin-top: 20px;
+    }
+
+    .empty-state-btn:hover {
+        background: linear-gradient(135deg, #357ABD, #4A90E2);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+    }
+
+    .empty-state-btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 10px rgba(74, 144, 226, 0.2);
+    }
+
+    /* 툴바 */
+    .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .toolbar-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border: none;
+        background: none;
+        border-radius: 4px;
+        color: #495057;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .toolbar-btn:hover {
+        background-color: #f1f3f5;
+    }
+
+    /* 검색 영역 */
+    .search-section {
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow);
+        transition: box-shadow 0.3s ease;
+    }
+
+    .search-section:hover {
+        box-shadow: var(--shadow-hover);
+    }
+
+    .search-filters {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .filter-select {
+        padding: 0.625rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        min-width: 120px;
+        font-size: 0.9rem;
+        color: var(--dark);
+        background-color: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .filter-select:hover {
+        border-color: var(--primary);
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .search-box {
+        display: flex;
+        flex: 1;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .search-box:focus-within {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .search-box input {
+        flex: 1;
+        padding: 0.625rem 1rem;
+        border: none;
+        outline: none;
+        font-size: 0.9rem;
+        color: var(--dark);
+    }
+
+    .search-box input::placeholder {
+        color: #adb5bd;
+    }
+
+    .search-btn {
+        padding: 0.625rem 1.25rem;
+        background: none;
+        border: none;
+        border-left: 1px solid var(--border);
+        cursor: pointer;
+        color: #adb5bd;
+        transition: all 0.3s ease;
+    }
+
+    .search-btn:hover {
+        background-color: var(--primary-light);
+        color: var(--primary);
+    }
+
+    /* 반응형 디자인 */
+    @media (max-width: 1024px) {
+        .support-header {
+            padding: 2rem;
+        }
+
+        .support-text h1 {
+            font-size: 2rem;
+        }
+
+        .support-image {
+            font-size: 6rem;
+            right: 1rem;
+        }
+
+        .stats-cards {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .action-card {
+            grid-column: span 2;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .support-header {
+            padding: 2rem 1.5rem;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .support-text h1 {
+            font-size: 1.75rem;
+        }
+
+        .support-text p {
+            font-size: 1rem;
+            margin: 1rem 0 1.5rem 0;
+        }
+
+        .support-actions {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .create-inquiry-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .support-image {
+            position: relative;
+            right: auto;
+            top: auto;
+            transform: none;
+            font-size: 5rem;
+            margin-top: 1.5rem;
+        }
+
+        .stats-cards {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .action-card {
+            grid-column: auto;
+        }
+
+        .stat-card {
+            padding: 1.25rem;
+        }
+
+        .inquiry-item {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            padding: 1rem;
+        }
+
+        .item-status,
+        .item-category,
+        .item-title,
+        .item-date {
+            text-align: left;
+            padding: 0;
+        }
+
+        .item-date {
+            color: var(--secondary);
+            font-size: 0.8rem;
+        }
+
+        .bottom-actions {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .left-actions,
+        .right-actions {
+            width: 100%;
+        }
+
+        .write-btn,
+        .faq-btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .search-filters {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .filter-select {
+            width: 100%;
+        }
+
+        .list-header {
+            display: none;
+        }
+    }
+
+    .filter-section {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .filter-group {
+        margin-bottom: 1rem;
+    }
+
+    .filter-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .filter-label {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: var(--dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .filter-options {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        background: white;
+        color: var(--secondary);
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .filter-btn:hover {
+        background: var(--primary-light);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .filter-btn.active {
+        background: var(--primary);
+        border-color: var(--primary);
+        color: white;
+    }
+
+    .search-group {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .search-btn {
+        padding: 0.5rem 1rem;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-btn:hover {
+        background: var(--primary-dark);
+    }
+
+    .page-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .header-icon {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .header-icon i {
+        font-size: 2.5rem;
+        color: white;
+    }
+
+    .header-text {
+        flex: 1;
+    }
+
+    .header-text h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+    }
+
+    .header-text p {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin: 0 0 1.5rem 0;
+    }
+
+    .header-stats {
+        display: flex;
+        gap: 2rem;
+    }
+
+    .stat-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        opacity: 0.8;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+
+    .stat-value.waiting {
+        color: #ffd43b;
+    }
+
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+
+        .header-content {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .header-icon {
+            width: 60px;
+            height: 60px;
+        }
+
+        .header-icon i {
+            font-size: 2rem;
+        }
+
+        .header-text h1 {
+            font-size: 1.5rem;
+        }
+
+        .header-stats {
+            justify-content: center;
+        }
+    }
+</style>
+
+<body>
+    <!-- 네비게이션 바 포함 -->
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <div class="page-container">
+        <!-- 페이지 제목 섹션 -->
+        <div class="page-header">
+            <div class="header-content">
+                <div class="header-icon">
+                    <i class="fas fa-comments"></i>
+                </div>
+                <div class="header-text">
+                    <h1>문의 게시판</h1>
+                    <p>궁금하신 점이나 불편사항을 남겨주시면 신속하게 답변 드리겠습니다.</p>
+                    <div class="header-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">전체 문의</span>
+                            <span class="stat-value" th:text="${totalCounselings}">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">답변 대기</span>
+                            <span class="stat-value waiting" th:text="${unansweredCounselings}">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 필터 및 검색 영역 -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <div class="filter-label">상태</div>
+                <div class="filter-options">
+                    <button class="filter-btn" th:classappend="${currentStatus == null} ? 'active'"
+                        data-status="all">전체</button>
+                    <button class="filter-btn" th:classappend="${currentStatus == 'false'} ? 'active'"
+                        data-status="false">답변대기</button>
+                    <button class="filter-btn" th:classappend="${currentStatus == 'true'} ? 'active'"
+                        data-status="true">답변완료</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <div class="filter-label">카테고리</div>
+                <div class="filter-options">
+                    <button class="filter-btn" th:classappend="${currentCategory == null} ? 'active'"
+                        data-category="all">전체</button>
+                    <button th:each="category : ${categories}" class="filter-btn"
+                        th:classappend="${currentCategory == category.name()} ? 'active'"
+                        th:data-category="${category.name()}" th:text="${category.displayName}">카테고리</button>
+                </div>
+            </div>
+            <div class="search-group">
+                <input type="text" id="searchInput" th:value="${currentKeyword}" placeholder="제목 검색"
+                    class="search-input">
+                <button id="searchBtn" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 알림 메시지 -->
+        <div th:if="${message}" class="alert alert-success fade-in">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${message}"></span>
+        </div>
+        <div th:if="${param.error}" class="alert alert-danger fade-in">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:if="${param.error == 'unauthorized'}">접근 권한이 없습니다.</span>
+            <span th:if="${param.error == 'not_found'}">존재하지 않는 문의입니다.</span>
+        </div>
+
+        <!-- 문의 목록 -->
+        <div class="inquiry-container">
+            <!-- 빈 상태 -->
+            <div th:if="${counselings.empty}" class="empty-state">
+                <div class="empty-state-content">
+                    <i class="fas fa-inbox"></i>
+                    <h3>문의 내역이 없습니다</h3>
+                    <p>궁금하신 점이 있으시다면 언제든 문의해주세요.</p>
+                    <button onclick="location.href='/counseling/create'" class="empty-state-btn">
+                        새 문의 작성하기
+                    </button>
+                </div>
+            </div>
+
+            <!-- 문의 리스트 -->
+            <div th:if="${!counselings.empty}" class="inquiry-list">
+                <div class="list-header">
+                    <div class="header-item">상태</div>
+                    <div class="header-item">카테고리</div>
+                    <div class="header-item title">제목</div>
+                    <div class="header-item">등록일</div>
+                </div>
+                <a th:each="counseling, stat : ${counselings}" th:href="@{/counseling/{id}(id=${counseling.id})}"
+                    class="inquiry-item">
+                    <div class="item-status"
+                        th:classappend="${counseling.isAnswered ? 'status-answered' : 'status-waiting'}">
+                        <span th:if="${counseling.isAnswered}" class="status-badge answered">답변완료</span>
+                        <span th:unless="${counseling.isAnswered}" class="status-badge waiting">답변대기</span>
+                    </div>
+                    <div class="item-category">
+                        <b><span th:text="${counseling.category.displayName}">일반 문의</span></b>
+                    </div>
+                    <div class="item-title">
+                        <span th:text="${counseling.title}">문의 제목</span>
+                    </div>
+                    <div class="item-date">
+                        <span th:text="${#temporals.format(counseling.createdAt, 'yyyy.MM.dd')}">2023.08.01</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- 하단 버튼 영역 -->
+        <div class="bottom-actions">
+            <div class="left-actions">
+                <a th:href="@{/counseling/faq}" class="faq-btn">
+                    <i class="fas fa-book"></i>
+                    FAQ
+                </a>
+            </div>
+            <div class="right-actions">
+                <a th:href="@{/counseling/create}" class="write-btn">
+                    <i class="fas fa-pen"></i>
+                    문의하기
+                </a>
+            </div>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div th:if="${!counselings.empty}" class="pagination">
+            <a th:if="${counselings.hasPrevious()}" th:href="@{/counseling(page=${counselings.number - 1})}"
+                class="page-btn">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+
+            <div class="page-numbers">
+                <a th:each="i : ${#numbers.sequence(0, counselings.totalPages - 1)}"
+                    th:if="${i >= counselings.number - 2 && i <= counselings.number + 2}"
+                    th:href="@{/counseling(page=${i})}"
+                    th:class="${i == counselings.number} ? 'page-number active' : 'page-number'"
+                    th:text="${i + 1}">1</a>
+            </div>
+
+            <a th:if="${counselings.hasNext()}" th:href="@{/counseling(page=${counselings.number + 1})}"
+                class="page-btn">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+    <script th:src="@{/js/main/nav.js}"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const searchInput = document.getElementById('searchInput');
+            const searchBtn = document.getElementById('searchBtn');
+
+            // 필터 버튼 클릭 이벤트
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function () {
+                    // 같은 그룹 내의 다른 버튼들의 active 클래스 제거
+                    const group = this.closest('.filter-options');
+                    group.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    // 클릭된 버튼에 active 클래스 추가
+                    this.classList.add('active');
+
+                    // 필터 적용
+                    applyFilters();
+                });
+            });
+
+            // 검색 버튼 클릭 이벤트
+            searchBtn.addEventListener('click', function () {
+                applyFilters();
+            });
+
+            // 엔터키 검색
+            searchInput.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    applyFilters();
+                }
+            });
+
+            function applyFilters() {
+                const status = document.querySelector('.filter-group:nth-child(1) .filter-btn.active').dataset.status;
+                const category = document.querySelector('.filter-group:nth-child(2) .filter-btn.active').dataset.category;
+                const keyword = searchInput.value.trim();
+
+                let url = '/counseling';
+                const params = new URLSearchParams(window.location.search);
+
+                // 페이지 파라미터 초기화 (필터 변경시 첫 페이지로)
+                params.delete('page');
+
+                // 상태 필터
+                if (status && status !== 'all') {
+                    params.set('status', status);
+                } else {
+                    params.delete('status');
+                }
+
+                // 카테고리 필터
+                if (category && category !== 'all') {
+                    params.set('category', category);
+                } else {
+                    params.delete('category');
+                }
+
+                // 검색어
+                if (keyword) {
+                    params.set('keyword', keyword);
+                } else {
+                    params.delete('keyword');
+                }
+
+                if (params.toString()) {
+                    url += '?' + params.toString();
+                }
+
+                window.location.href = url;
+            }
+        });
+    </script>
+</body>
+
+</html>

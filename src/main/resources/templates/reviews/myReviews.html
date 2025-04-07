@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>내 리뷰 | ワクワク</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/reviews/myReviews.css}">
+</head>
+
+<body>
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">내 리뷰</h1>
+            <p class="page-description">작성한 여행 리뷰를 관리하세요</p>
+        </div>
+
+        <div class="reviews-container" th:if="${reviewsPage == null || reviewsPage.empty}">
+            <div class="no-reviews">
+                <div class="no-reviews-icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <h2 class="no-reviews-text">아직 작성한 리뷰가 없습니다.</h2>
+                <p>여행을 다녀오셨나요? 여행 경험을 공유해보세요!</p>
+                <a href="/reviews/write" class="btn btn-primary" style="margin-top: 1.5rem;">
+                    <i class="fas fa-pen"></i> 리뷰 작성하기
+                </a>
+            </div>
+        </div>
+
+        <div class="reviews-container" th:unless="${reviewsPage == null || reviewsPage.empty}">
+            <div class="review-item" th:each="review : ${reviewsPage.content}">
+                <div class="review-image">
+                    <a th:href="@{/reviews/{id}(id=${review.id})}">
+                        <div th:if="${review.images != null && !review.images.isEmpty()}" class="image-wrapper">
+                            <img th:src="${review.images[0]}" alt="리뷰 이미지">
+                        </div>
+                        <div th:unless="${review.images != null && !review.images.isEmpty()}" class="no-image">
+                            <i class="fas fa-image"></i>
+                        </div>
+                    </a>
+                </div>
+                <div class="review-content">
+                    <div class="review-header">
+                        <h3 class="review-title">
+                            <a th:href="@{/reviews/{id}(id=${review.id})}" th:text="${review.title}">제주도 여행 후기</a>
+                        </h3>
+                        <span class="review-destination" th:text="${review.destination}">제주</span>
+                    </div>
+                    <div class="review-rating">
+                        <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                            <i class="fas fa-star" th:if="${i <= review.rating}"></i>
+                            <i class="far fa-star" th:unless="${i <= review.rating}"></i>
+                        </th:block>
+                        <span class="view-info">
+                            <i class="fas fa-eye"></i>
+                            <span th:text="${review.viewCount != null ? review.viewCount : 0}">0</span>
+                        </span>
+                    </div>
+                    <p class="review-excerpt" th:text="${review.content}">리뷰 내용의 일부가 여기에 표시됩니다...</p>
+                    <div class="review-tags" th:if="${review.tags != null && !review.tags.isEmpty()}">
+                        <span class="tag" th:each="tag : ${review.tags}" th:text="${tag}">힐링</span>
+                    </div>
+                    <div class="review-actions">
+                        <span class="review-date" th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd')}">2023-06-15</span>
+                        <div>
+                            <a th:href="@{/reviews/edit/{id}(id=${review.id})}">
+                                <i class="fas fa-edit"></i> 수정
+                            </a>
+                            <a href="javascript:void(0)" class="delete-btn" th:onclick="'confirmDelete(' + ${review.id} + ')'">
+                                <i class="fas fa-trash-alt"></i> 삭제
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="pagination" th:if="${reviewsPage != null && reviewsPage.totalPages > 1}">
+            <!-- 이전 페이지 링크 -->
+            <a th:if="${reviewsPage.hasPrevious()}" th:href="@{/reviews/my-reviews(page=${reviewsPage.number - 1})}" aria-label="Previous">
+                &laquo;
+            </a>
+            <span th:unless="${reviewsPage.hasPrevious()}" class="disabled">&laquo;</span>
+
+            <!-- 페이지 번호 -->
+            <a th:each="pageNumber : ${#numbers.sequence(0, reviewsPage.totalPages - 1)}"
+                th:if="${pageNumber >= reviewsPage.number - 2 && pageNumber <= reviewsPage.number + 2}"
+                th:href="@{/reviews/my-reviews(page=${pageNumber})}"
+                th:text="${pageNumber + 1}"
+                th:class="${pageNumber == reviewsPage.number ? 'active' : ''}">
+            </a>
+
+            <!-- 다음 페이지 링크 -->
+            <a th:if="${reviewsPage.hasNext()}" th:href="@{/reviews/my-reviews(page=${reviewsPage.number + 1})}" aria-label="Next">
+                &raquo;
+            </a>
+            <span th:unless="${reviewsPage.hasNext()}" class="disabled">&raquo;</span>
+        </div>
+    </div>
+
+    <!-- 삭제 확인 모달 -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">리뷰 삭제</h2>
+            <p>정말로 이 리뷰를 삭제하시겠습니까?</p>
+            <p>삭제된 리뷰는 복구할 수 없습니다.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-cancel" onclick="closeModal()">취소</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        let reviewIdToDelete;
+        const modal = document.getElementById('deleteModal');
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+
+        function confirmDelete(reviewId) {
+            reviewIdToDelete = reviewId;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        confirmBtn.addEventListener('click', function() {
+            if (reviewIdToDelete) {
+                deleteReview(reviewIdToDelete);
+            }
+        });
+
+        function deleteReview(reviewId) {
+            fetch(`/reviews/${reviewId}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeModal();
+                    // 삭제 성공 시 페이지 새로고침
+                    window.location.reload();
+                } else {
+                    alert(data.message || '리뷰 삭제에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('리뷰 삭제 중 오류가 발생했습니다.');
+            });
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+    <script th:src="@{/js/main/nav.js}"></script>
+</body>
+
+</html>

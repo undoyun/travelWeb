@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ワクワク:여행 일정 확정</title>
+    <!-- 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <!-- 아이콘용(폰트어썸) CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- CSS 파일 연결 -->
+    <link rel="stylesheet" th:href="@{/css/itineraries/itineraryResult.css}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="result-header">
+            <h1><i class="fas fa-check-circle"></i> 여행 일정 확정 완료</h1>
+            <p class="subtitle">여행 계획이 성공적으로 저장되었습니다.</p>
+        </div>
+
+        <div class="plan-overview">
+            <div class="plan-image-container">
+                <div class="plan-image" th:if="${scheduleItem.planPhoto != null && !scheduleItem.planPhoto.isEmpty()}"
+                    th:style="'background-image: url(' + ${scheduleItem.planPhoto} + ');'">
+                </div>
+                <div class="plan-image default-image"
+                    th:if="${scheduleItem.planPhoto == null || scheduleItem.planPhoto.isEmpty()}">
+                    <i class="fas fa-image"></i>
+                    <span>이미지 없음</span>
+                </div>
+            </div>
+
+            <div class="plan-details">
+                <h2 th:text="${scheduleItem.planName}">여행 이름</h2>
+                <div class="plan-info">
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-map-marker-alt"></i> 출발지</div>
+                        <div class="info-value" th:text="${scheduleItem.departLocation}">서울</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-map-pin"></i> 목적지</div>
+                        <div class="info-value" th:text="${scheduleItem.destination}">오사카</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-calendar-alt"></i> 여행 기간</div>
+                        <div class="info-value">
+                            <span th:text="${scheduleItem.startDate}">2025-03-11</span> ~
+                            <span th:text="${scheduleItem.endDate}">2025-03-13</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-clock"></i> 출발/도착 시간</div>
+                        <div class="info-value">
+                            <span th:text="${scheduleItem.departureTime}">09:00</span> /
+                            <span th:text="${scheduleItem.returnTime}">18:00</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-plane"></i> 교통 수단</div>
+                        <div class="info-value" th:text="${scheduleItem.transportation}">비행기</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-bullseye"></i> 여행 목적</div>
+                        <div class="info-value" th:text="${scheduleItem.purpose}">관광</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label"><i class="fas fa-wallet"></i> 예산</div>
+                        <div class="info-value"
+                            th:text="${#numbers.formatInteger(scheduleItem.budget, 0, 'COMMA') + '원'}">500,000원</div>
+                    </div>
+                </div>
+                <div class="plan-description"
+                    th:if="${scheduleItem.planDescription != null && !scheduleItem.planDescription.isEmpty()}">
+                    <p th:text="${scheduleItem.planDescription}">여행 설명</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="itinerary-section">
+            <h2><i class="fas fa-list-ul"></i> 일정 상세</h2>
+
+            <div id="itineraryContainer" class="itinerary-container">
+                <!-- 로딩 스피너 -->
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner"></i>
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <a th:href="@{/schedule/schedule}" class="btn back-btn"><i class="fas fa-arrow-left"></i> 일정 목록으로</a>
+                <a href="#" class="btn submit-btn" onclick="window.print()"><i class="fas fa-print"></i> 인쇄하기</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 일정 JSON 데이터 (hidden) -->
+    <div id="scheduleJsonData" style="display: none;" th:text="${scheduleItem.scheduleJson}"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 일정 데이터 로드
+            const scheduleJsonDataElement = document.getElementById('scheduleJsonData');
+            const scheduleJsonData = scheduleJsonDataElement ? scheduleJsonDataElement.textContent : '';
+            const itineraryContainer = document.getElementById('itineraryContainer');
+
+            // JavaScript로 직접 파싱
+            loadItineraryData();
+
+            function loadItineraryData() {
+                try {
+                    // 로딩 스피너 표시
+                    itineraryContainer.innerHTML = `
+                        <div class="loading-spinner">
+                            <i class="fas fa-spinner"></i>
+                        </div>
+                    `;
+
+                    console.log("원본 JSON 데이터 타입:", typeof scheduleJsonData);
+                    console.log("원본 JSON 데이터 내용:", scheduleJsonData);
+
+                    // 빈 데이터 체크
+                    if (!scheduleJsonData || scheduleJsonData.trim() === "") {
+                        itineraryContainer.innerHTML = `
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>일정 데이터를 불러올 수 없습니다.</p>
+                                <p>여행 계획에 대한 권한이 없거나 일정이 아직 생성되지 않았을 수 있습니다.</p>
+                                <button class="btn back-btn" onclick="history.back()">이전으로</button>
+                            </div>
+                        `;
+                        throw new Error("빈 일정 데이터");
+                    }
+
+                    // JavaScript로 직접 파싱
+                    try {
+                        // 파싱 전 유효성 검사 추가
+                        if (scheduleJsonData === "null" || scheduleJsonData === "undefined") {
+                            throw new Error("유효하지 않은 JSON 데이터: " + scheduleJsonData);
+                        }
+
+                        // 데이터 처리 준비
+                        let dataToProcess = scheduleJsonData;
+
+                        // 큰따옴표로 시작하고 끝나는 경우 (JSON 문자열이 이스케이프된 경우)
+                        if (dataToProcess.startsWith('"') && dataToProcess.endsWith('"')) {
+                            // 앞뒤 따옴표 제거 후 이스케이프된 문자 처리
+                            dataToProcess = JSON.parse(dataToProcess);
+                        }
+
+                        // 데이터가 이미 객체인 경우 (이미 파싱된 경우)
+                        if (typeof dataToProcess === 'object' && dataToProcess !== null) {
+                            console.log("데이터가 이미 객체입니다:", dataToProcess);
+                            processParsedData(dataToProcess);
+                            return;
+                        }
+
+                        // 문자열 데이터 파싱 시도
+                        const parsedData = JSON.parse(dataToProcess);
+                        processParsedData(parsedData);
+
+                    } catch (parseError) {
+                        console.error('JSON 파싱 오류:', parseError);
+                        console.log('원본 데이터:', scheduleJsonData);
+                        itineraryContainer.innerHTML = `
+                            <div class="error-message">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>일정 데이터를 불러오는 중 오류가 발생했습니다.</p>
+                                <p>${parseError.message}</p>
+                                <p>여행 계획에 대한 권한이 없거나 일정 데이터가 손상되었을 수 있습니다.</p>
+                                <button class="btn back-btn" onclick="history.back()">이전으로</button>
+                            </div>
+                        `;
+                    }
+                } catch (error) {
+                    console.error('일정 데이터 로드 오류:', error);
+                    itineraryContainer.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>일정 데이터를 불러오는 중 오류가 발생했습니다.</p>
+                            <p>${error.message}</p>
+                            <p>문제가 계속되면 관리자에게 문의해주세요.</p>
+                            <button class="btn back-btn" onclick="history.back()">이전으로</button>
+                        </div>
+                    `;
+                }
+            }
+
+            // 파싱된 데이터 처리 함수 분리
+            function processParsedData(parsedData) {
+                console.log("파싱된 데이터:", parsedData);
+                let itineraryData = null;
+
+                try {
+                    // 데이터 구조 확인 및 변환
+                    if (!parsedData) {
+                        throw new Error("유효하지 않은 데이터: 파싱된 데이터가 없습니다.");
+                    }
+
+                    // 각 가능한 데이터 구조 시도
+                    if (parsedData && parsedData.scheduleJson) {
+                        try {
+                            // scheduleJson이 문자열인 경우 파싱
+                            const scheduleJsonValue = parsedData.scheduleJson;
+                            console.log("scheduleJson 타입:", typeof scheduleJsonValue);
+
+                            // null, undefined 체크
+                            if (!scheduleJsonValue) {
+                                throw new Error("scheduleJson이 비어있습니다.");
+                            }
+
+                            let scheduleData;
+                            if (typeof scheduleJsonValue === 'string') {
+                                // 빈 문자열 체크
+                                if (scheduleJsonValue.trim() === '') {
+                                    throw new Error("scheduleJson이 빈 문자열입니다.");
+                                }
+
+                                // 문자열을 JSON으로 파싱
+                                scheduleData = JSON.parse(scheduleJsonValue);
+                            } else {
+                                // 이미 객체인 경우
+                                scheduleData = scheduleJsonValue;
+                            }
+
+                            console.log("scheduleJson 파싱 데이터:", scheduleData);
+
+                            // 데이터 구조 변환
+                            if (scheduleData && scheduleData.travelPlan && scheduleData.travelPlan.itinerary) {
+                                // travelPlan.itinerary 구조 사용
+                                itineraryData = {
+                                    planName: parsedData.planName || scheduleData.travelPlan.purpose || "여행 계획",
+                                    planPhoto: parsedData.planPhoto || "",
+                                    planDescription: parsedData.planDescription || "",
+                                    destination: scheduleData.travelPlan.destination || "",
+                                    startDate: scheduleData.travelPlan.startDate || "",
+                                    endDate: scheduleData.travelPlan.endDate || "",
+                                    days: scheduleData.travelPlan.itinerary || []
+                                };
+                            } else if (scheduleData && scheduleData.days) {
+                                // 기본 구조 생성 (days 배열 포함)
+                                itineraryData = {
+                                    planName: parsedData.planName || "여행 계획",
+                                    planPhoto: parsedData.planPhoto || "",
+                                    planDescription: parsedData.planDescription || "",
+                                    destination: parsedData.destination || scheduleData.destination || "",
+                                    startDate: parsedData.startDate || scheduleData.startDate || "",
+                                    endDate: parsedData.endDate || scheduleData.endDate || "",
+                                    days: scheduleData.days
+                                };
+                            } else {
+                                // 데이터 형식 불분명, 기본 구조 사용
+                                console.warn("scheduleJson에서 인식할 수 있는 일정 구조를 찾을 수 없습니다:", scheduleData);
+                                itineraryData = {
+                                    planName: parsedData.planName || "여행 계획",
+                                    planPhoto: parsedData.planPhoto || "",
+                                    planDescription: parsedData.planDescription || "",
+                                    destination: parsedData.destination || "",
+                                    startDate: parsedData.startDate || "",
+                                    endDate: parsedData.endDate || "",
+                                    days: []
+                                };
+
+                                // scheduleData가 배열인 경우 day 형식으로 변환 시도
+                                if (Array.isArray(scheduleData)) {
+                                    itineraryData.days = scheduleData.map((item, index) => {
+                                        if (item.date && (item.schedules || item.schedule)) {
+                                            return item; // 이미 적절한 형식
+                                        } else {
+                                            // 기본 day 객체로 변환
+                                            return {
+                                                date: `Day ${index + 1}`,
+                                                schedules: [item] // 단일 항목을 배열에 포함
+                                            };
+                                        }
+                                    });
+                                }
+                            }
+                        } catch (subParseError) {
+                            console.error('scheduleJson 파싱 오류:', subParseError);
+                            throw subParseError; // 상위 오류 처리로 전파
+                        }
+                    } else if (parsedData && parsedData.travelPlan && parsedData.travelPlan.itinerary) {
+                        // travelPlan.itinerary 구조 직접 사용
+                        console.log("travelPlan.itinerary 구조 사용:", parsedData.travelPlan.itinerary);
+                        itineraryData = {
+                            planName: parsedData.travelPlan.purpose || "여행 계획",
+                            planPhoto: parsedData.planPhoto || "",
+                            planDescription: parsedData.planDescription || "",
+                            destination: parsedData.travelPlan.destination || "",
+                            startDate: parsedData.travelPlan.startDate || "",
+                            endDate: parsedData.travelPlan.endDate || "",
+                            days: parsedData.travelPlan.itinerary || []
+                        };
+                    } else {
+                        // 다른 구조 처리 시도
+                        console.log("기타 데이터 구조 처리 시도");
+
+                        // 기본 데이터 생성
+                        itineraryData = {
+                            planName: parsedData.planName || parsedData.purpose || "여행 계획",
+                            planPhoto: parsedData.planPhoto || "",
+                            planDescription: parsedData.planDescription || "",
+                            destination: parsedData.destination || "",
+                            startDate: parsedData.startDate || "",
+                            endDate: parsedData.endDate || "",
+                            days: []
+                        };
+
+                        // 일정 데이터 찾기 시도
+                        if (parsedData.days && Array.isArray(parsedData.days)) {
+                            itineraryData.days = parsedData.days;
+                        } else if (parsedData.itinerary && Array.isArray(parsedData.itinerary)) {
+                            itineraryData.days = parsedData.itinerary;
+                        } else if (Array.isArray(parsedData)) {
+                            // 배열 데이터인 경우
+                            itineraryData.days = parsedData.map((item, index) => {
+                                // 이미 day 형식이면 그대로 사용
+                                if (item.date) {
+                                    return item;
+                                }
+                                // 임의 데이터 형식이면 변환
+                                return {
+                                    date: `Day ${index + 1}`,
+                                    schedule: [item]
+                                };
+                            });
+                        }
+                    }
+
+                    // 최종 데이터 검증
+                    if (!itineraryData) {
+                        throw new Error("일정 데이터를 생성할 수 없습니다.");
+                    }
+
+                    // days 배열이 없으면 빈 배열로 초기화
+                    if (!itineraryData.days) {
+                        itineraryData.days = [];
+                    }
+
+                    console.log("변환된 itineraryData:", itineraryData);
+
+                    // 데이터가 없거나 days 배열이 비어있는 경우
+                    if (!itineraryData || !itineraryData.days || itineraryData.days.length === 0) {
+                        itineraryContainer.innerHTML = `
+                            <div class="empty-itinerary">
+                                <i class="fas fa-calendar-times"></i>
+                                <p>일정 데이터가 없습니다.</p>
+                                <p>여행 계획에 대한 권한이 없거나 일정이 아직 생성되지 않았을 수 있습니다.</p>
+                                <button class="btn back-btn" onclick="history.back()">이전으로</button>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    // 로딩 스피너 제거 및 일정 렌더링
+                    renderItinerary(itineraryData);
+
+                } catch (error) {
+                    console.error("데이터 처리 중 오류 발생:", error);
+                    itineraryContainer.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>일정 데이터 처리 중 오류가 발생했습니다.</p>
+                            <p>${error.message}</p>
+                            <p>여행 계획에 대한 권한이 없거나 일정 데이터가 손상되었을 수 있습니다.</p>
+                            <button class="btn back-btn" onclick="history.back()">이전으로</button>
+                        </div>
+                    `;
+                }
+            }
+
+            // 일정 렌더링 함수
+            function renderItinerary(itineraryData) {
+                // 로딩 스피너 제거
+                itineraryContainer.innerHTML = '';
+
+                // 일정 헤더 정보 표시
+                const headerElement = document.createElement('div');
+                headerElement.className = 'itinerary-header';
+                headerElement.innerHTML = `
+                    <h2>${itineraryData.planName || '여행 일정'}</h2>
+                    ${itineraryData.planPhoto ? `<div class="plan-photo" style="background-image: url(${itineraryData.planPhoto})"></div>` : ''}
+                    <div class="plan-info">
+                        <p><i class="fas fa-map-marker-alt"></i> ${itineraryData.destination || ''}</p>
+                        <p><i class="fas fa-calendar-alt"></i> ${itineraryData.startDate || ''} ~ ${itineraryData.endDate || ''}</p>
+                        ${itineraryData.planDescription ? `<p><i class="fas fa-info-circle"></i> ${itineraryData.planDescription}</p>` : ''}
+                    </div>
+                `;
+                itineraryContainer.appendChild(headerElement);
+
+                // 각 날짜별 일정 렌더링
+                itineraryData.days.forEach((day, index) => {
+                    const dayElement = createDayElement(day, index + 1);
+                    itineraryContainer.appendChild(dayElement);
+                });
+            }
+
+            // 날짜 요소 생성 함수
+            function createDayElement(day, dayNumber) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'day-container';
+
+                // 날짜 헤더
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.innerHTML = `
+                    <h3 class="day-title">Day ${dayNumber} <span class="day-date">${day.date || '날짜 정보 없음'}</span></h3>
+                `;
+                dayElement.appendChild(dayHeader);
+
+                // 일정 컨테이너
+                const scheduleContainer = document.createElement('div');
+                scheduleContainer.className = 'schedule-container';
+
+                // 각 일정 항목 추가 - 데이터 구조 검사 및 변환
+                let schedules = [];
+
+                try {
+                    // 다양한 데이터 구조 처리
+                    if (day && Array.isArray(day.schedules)) {
+                        // 이미 schedules 속성이 있는 경우
+                        schedules = day.schedules;
+                    } else if (day && Array.isArray(day.schedule)) {
+                        // schedule 속성을 사용하는 경우 (travelPlan.itinerary 형식)
+                        schedules = day.schedule.map(item => {
+                            return {
+                                time: item.departureTime || item.time || '',
+                                content: item.content || `${item.category || ''} - ${item.location || ''}`,
+                                location: item.location || '',
+                                duration: item.duration || '',
+                                cost: item.cost || '',
+                                category: item.category || ''
+                            };
+                        });
+                    } else {
+                        // 두 속성 모두 없는 경우 빈 배열 사용
+                        console.warn('날짜 데이터에 schedules 또는 schedule 속성이 없습니다:', day);
+
+                        // 일정 없음 안내 메시지 추가
+                        const noScheduleMessage = document.createElement('div');
+                        noScheduleMessage.className = 'no-schedule-message';
+                        noScheduleMessage.innerHTML = `
+                            <p><i class="fas fa-info-circle"></i> 이 날짜에 등록된 일정이 없습니다.</p>
+                        `;
+                        scheduleContainer.appendChild(noScheduleMessage);
+                        schedules = [];
+                    }
+
+                    // 일정 항목 추가
+                    if (schedules.length > 0) {
+                        schedules.forEach(schedule => {
+                            if (schedule) {  // undefined 체크 추가
+                                const scheduleItem = createScheduleElement(schedule);
+                                scheduleContainer.appendChild(scheduleItem);
+                            }
+                        });
+                    }
+                } catch (error) {
+                    console.error('일정 항목 처리 중 오류 발생:', error, day);
+                    // 오류 발생 시 메시지 표시
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'schedule-error';
+                    errorMessage.innerHTML = `
+                        <p><i class="fas fa-exclamation-triangle"></i> 일정 데이터 처리 중 오류가 발생했습니다.</p>
+                    `;
+                    scheduleContainer.appendChild(errorMessage);
+                }
+
+                dayElement.appendChild(scheduleContainer);
+                return dayElement;
+            }
+
+            // 일정 요소 생성 함수
+            function createScheduleElement(schedule) {
+                if (!schedule) {
+                    console.warn('일정 항목이 정의되지 않았습니다.');
+                    const errorElement = document.createElement('div');
+                    errorElement.className = 'schedule-item schedule-error';
+                    errorElement.innerHTML = `
+                        <div class="schedule-content">
+                            <p><i class="fas fa-exclamation-circle"></i> 잘못된 일정 데이터</p>
+                        </div>
+                    `;
+                    return errorElement;
+                }
+
+                const scheduleElement = document.createElement('div');
+                scheduleElement.className = 'schedule-item';
+
+                // 시간
+                const timeElement = document.createElement('div');
+                timeElement.className = 'schedule-time';
+                timeElement.innerHTML = `<span>${schedule.time || '00:00'}</span>`;
+
+                // 내용
+                const contentElement = document.createElement('div');
+                contentElement.className = 'schedule-content';
+
+                // content가 없는 경우 대체 텍스트 생성
+                let contentText = schedule.content || '';
+                if (!contentText && (schedule.category || schedule.location)) {
+                    contentText = `${schedule.category || ''} ${schedule.location ? '- ' + schedule.location : ''}`;
+                }
+
+                contentElement.innerHTML = `<p>${contentText || '일정 내용 없음'}</p>`;
+
+                // 추가 정보가 있는 경우
+                if (schedule.location || schedule.cost || schedule.duration || schedule.category) {
+                    const detailsElement = document.createElement('div');
+                    detailsElement.className = 'schedule-details';
+
+                    let detailsHTML = '';
+
+                    if (schedule.location) {
+                        detailsHTML += `<div class="detail-item"><i class="fas fa-map-marker-alt"></i> ${schedule.location}</div>`;
+                    }
+
+                    if (schedule.duration) {
+                        detailsHTML += `<div class="detail-item"><i class="fas fa-clock"></i> ${schedule.duration}</div>`;
+                    }
+
+                    if (schedule.cost) {
+                        detailsHTML += `<div class="detail-item"><i class="fas fa-won-sign"></i> ${schedule.cost}</div>`;
+                    }
+
+                    if (schedule.category) {
+                        detailsHTML += `<div class="detail-item"><i class="fas fa-tag"></i> ${schedule.category}</div>`;
+                    }
+
+                    detailsElement.innerHTML = detailsHTML;
+                    contentElement.appendChild(detailsElement);
+                }
+
+                scheduleElement.appendChild(timeElement);
+                scheduleElement.appendChild(contentElement);
+
+                return scheduleElement;
+            }
+        });
+    </script>
+</body>
+
+</html>

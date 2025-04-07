@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>업로드 이미지 테스트</title>
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #0080c6;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .test-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .image-container {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .image-container h3 {
+            margin-top: 0;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .image-box {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .image-box img {
+            max-width: 200px;
+            max-height: 200px;
+            border: 1px solid #eee;
+            margin-right: 20px;
+        }
+        
+        .image-path {
+            font-family: monospace;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+        
+        .input-group {
+            margin-bottom: 15px;
+        }
+        
+        .input-group input {
+            width: 80%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .input-group button {
+            padding: 8px 15px;
+            background-color: #0080c6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .log-container {
+            background-color: #2b2b2b;
+            color: #f8f8f8;
+            font-family: monospace;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        
+        .log-success {
+            color: #85d996;
+        }
+        
+        .log-error {
+            color: #ff8a8a;
+        }
+        
+        .test-image {
+            border: 2px solid #ddd;
+            max-width: 300px;
+            height: auto;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>업로드 이미지 접근 테스트</h1>
+    
+    <div class="test-container">
+        <h2>이미지 경로 확인</h2>
+        
+        <div class="input-group">
+            <input type="text" id="imagePathInput" placeholder="/uploads/reviews/이미지파일명.jpg">
+            <button onclick="testImagePath()">테스트</button>
+        </div>
+        
+        <div id="imageTestResult"></div>
+        
+        <div class="log-container" id="logContainer">
+            <div>로그 출력...</div>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>알려진 경로 테스트</h2>
+        
+        <div class="image-container">
+            <h3>고정 경로 테스트 (/img/user_icon.png)</h3>
+            <div class="image-box">
+                <img src="/img/user_icon.png" alt="사용자 아이콘" onerror="handleImageError(this)">
+                <div class="image-path">/img/user_icon.png</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-container">
+        <h2>파일 업로드 테스트</h2>
+        
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="input-group" style="margin-bottom: 15px;">
+                <input type="file" id="fileInput" name="file" accept="image/*">
+            </div>
+            <button type="button" onclick="uploadFile()" style="padding: 8px 15px; background-color: #0080c6; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                업로드
+            </button>
+        </form>
+        
+        <div id="uploadResult" style="margin-top: 20px;"></div>
+    </div>
+    
+    <script>
+        // 이미지 로드 에러 처리
+        function handleImageError(img) {
+            logMessage(`이미지 로드 실패: ${img.src}`, 'error');
+            img.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='150'><rect width='100%' height='100%' fill='%23f2f2f2'/><text x='50%' y='50%' font-family='Arial' font-size='14' text-anchor='middle' fill='%23999'>이미지 없음</text></svg>";
+        }
+        
+        // 이미지 경로 테스트
+        function testImagePath() {
+            const imagePath = document.getElementById('imagePathInput').value.trim();
+            const resultContainer = document.getElementById('imageTestResult');
+            
+            if (!imagePath) {
+                logMessage('이미지 경로를 입력해주세요.', 'error');
+                return;
+            }
+            
+            logMessage(`이미지 경로 테스트 시작: ${imagePath}`);
+            
+            // 테스트 이미지 엘리먼트 생성 및 표시
+            resultContainer.innerHTML = '';
+            const img = document.createElement('img');
+            img.className = 'test-image';
+            img.alt = '테스트 이미지';
+            img.src = imagePath;
+            
+            // 로드 성공/실패 이벤트 처리
+            img.onload = function() {
+                logMessage(`이미지 로드 성공! 크기: ${this.naturalWidth}x${this.naturalHeight}`, 'success');
+            };
+            
+            img.onerror = function() {
+                logMessage(`이미지 로드 실패: ${imagePath}`, 'error');
+                handleImageError(this);
+            };
+            
+            resultContainer.appendChild(img);
+            
+            // 경로 정보 표시
+            const pathInfo = document.createElement('div');
+            pathInfo.className = 'image-path';
+            pathInfo.textContent = imagePath;
+            resultContainer.appendChild(pathInfo);
+            
+            // 전체 URL 테스트도 시도
+            const fullUrl = window.location.origin + (imagePath.startsWith('/') ? imagePath : '/' + imagePath);
+            logMessage(`전체 URL: ${fullUrl}`);
+            
+            // HTTP 상태 확인
+            fetch(imagePath)
+                .then(response => {
+                    logMessage(`HTTP 응답: ${response.status} ${response.statusText}`, 
+                              response.ok ? 'success' : 'error');
+                    return response.blob();
+                })
+                .then(blob => {
+                    logMessage(`파일 타입: ${blob.type}, 크기: ${Math.round(blob.size / 1024)}KB`, 'success');
+                })
+                .catch(error => {
+                    logMessage(`요청 에러: ${error.message}`, 'error');
+                });
+        }
+        
+        // 로그 메시지 표시
+        function logMessage(message, type = '') {
+            const logContainer = document.getElementById('logContainer');
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            
+            if (type === 'error') {
+                logEntry.className = 'log-error';
+            } else if (type === 'success') {
+                logEntry.className = 'log-success';
+            }
+            
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // 파일 업로드 함수
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('uploadResult');
+            
+            if (!fileInput.files || fileInput.files.length === 0) {
+                logMessage('파일을 선택해주세요.', 'error');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            logMessage(`파일 업로드 시작: ${file.name}, 크기: ${file.size}바이트, 타입: ${file.type}`);
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            fetch('/api/test/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP 에러: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                logMessage(`업로드 성공! 파일 경로: ${data.filePath}`, 'success');
+                
+                // 결과 표시
+                resultDiv.innerHTML = `
+                    <div style="padding: 15px; border: 1px solid #ccc; border-radius: 4px; margin-top: 15px;">
+                        <h3 style="margin-top: 0;">업로드 결과</h3>
+                        <p>파일 경로: <code>${data.filePath}</code></p>
+                        <div>
+                            <img src="${data.filePath}" style="max-width: 300px; border: 1px solid #ddd; margin-top: 10px;" 
+                                 onerror="handleImageError(this)">
+                        </div>
+                    </div>
+                `;
+            })
+            .catch(error => {
+                logMessage(`업로드 실패: ${error.message}`, 'error');
+            });
+        }
+    </script>
+</body>
+</html> 

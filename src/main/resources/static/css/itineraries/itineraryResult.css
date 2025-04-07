@@ -1,0 +1,503 @@
+/* 여행 일정 결과 페이지 스타일 */
+:root {
+    --primary-color: #0080c6; /* 부산 대표 색상 */
+    --secondary-color: #ffffff;
+    --accent-color: #ff9f43;
+    --text-color: #333;
+    --text-light: #7f8c8d;
+    --light-gray: #f5f6fa;
+    --medium-gray: #dfe4ea;
+    --dark-gray: #7f8c8d;
+    --error-color: #e74c3c;
+    --success-color: #2ecc71;
+    --background-color: #f5f6fa;
+    --border-color: #dfe4ea;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --hover-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: var(--secondary-color);
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.container:hover {
+    box-shadow: var(--hover-shadow);
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h1 {
+    color: var(--primary-color);
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+h1 i {
+    margin-right: 10px;
+    color: var(--success-color);
+}
+
+.subtitle {
+    color: var(--dark-gray);
+}
+
+h2 {
+    margin-bottom: 20px;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+h2 i {
+    margin-right: 10px;
+    color: var(--accent-color);
+}
+
+/* 계획 개요 스타일 */
+.plan-overview {
+    display: flex;
+    margin-bottom: 30px;
+    background-color: var(--light-gray);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.plan-overview:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-3px);
+}
+
+.plan-image-container {
+    flex: 1;
+    max-width: 300px;
+}
+
+.plan-image {
+    width: 100%;
+    height: 100%;
+    min-height: 200px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: all 0.5s ease;
+}
+
+.plan-image:hover {
+    transform: scale(1.05);
+}
+
+.default-image {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--medium-gray);
+    color: white;
+}
+
+.default-image i {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.plan-details {
+    flex: 2;
+    padding: 20px;
+}
+
+.plan-details h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.plan-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+}
+
+.info-item:hover {
+    transform: translateY(-3px);
+}
+
+.info-label {
+    font-size: 14px;
+    color: var(--dark-gray);
+    margin-bottom: 5px;
+}
+
+.info-label i {
+    margin-right: 5px;
+    color: var(--accent-color);
+}
+
+.info-value {
+    font-weight: 500;
+}
+
+.plan-description {
+    padding-top: 15px;
+    border-top: 1px solid var(--medium-gray);
+    color: var(--dark-gray);
+    font-style: italic;
+}
+
+/* 일정 섹션 스타일 */
+.itinerary-section {
+    margin-top: 30px;
+}
+
+.itinerary-container {
+    margin-bottom: 30px;
+}
+
+.day-container {
+    margin-bottom: 25px;
+    border: 1px solid var(--medium-gray);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    background-color: var(--secondary-color);
+}
+
+.day-container:hover {
+    box-shadow: var(--hover-shadow);
+    transform: translateY(-3px);
+}
+
+.day-header {
+    padding: 15px;
+    background-color: var(--light-gray);
+    transition: all 0.3s ease;
+}
+
+.day-header:hover {
+    background-color: #e6f4ff; /* 부산 라이트 컬러 */
+}
+
+.day-title {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.day-date {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+    margin-left: 10px;
+}
+
+.schedule-container {
+    padding: 15px;
+}
+
+.schedule-item {
+    display: flex;
+    padding: 12px;
+    margin-bottom: 10px;
+    border: 1px solid var(--medium-gray);
+    border-radius: 8px;
+    background-color: var(--secondary-color);
+    transition: all 0.3s ease;
+}
+
+.schedule-item:hover {
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.schedule-time {
+    width: 80px;
+    flex-shrink: 0;
+    font-weight: 500;
+    color: var(--primary-color);
+}
+
+.schedule-content {
+    flex-grow: 1;
+}
+
+.schedule-content p {
+    margin-bottom: 5px;
+}
+
+.schedule-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--dark-gray);
+}
+
+.detail-item {
+    background-color: var(--light-gray);
+    padding: 3px 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.detail-item:hover {
+    background-color: #e6f4ff;
+    transform: translateY(-2px);
+}
+
+.detail-item i {
+    margin-right: 5px;
+    color: var(--accent-color);
+}
+
+/* 지도 섹션 스타일 */
+.map-section {
+    margin-bottom: 30px;
+}
+
+.map-container {
+    height: 300px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: var(--light-gray);
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.map-container:hover {
+    box-shadow: var(--hover-shadow);
+}
+
+.map-placeholder {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--dark-gray);
+}
+
+.map-placeholder i {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+/* 버튼 스타일 */
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn i {
+    margin-right: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--hover-shadow);
+}
+
+.back-btn {
+    background-color: var(--medium-gray);
+    color: var(--text-color);
+}
+
+.back-btn:hover {
+    background-color: #cfd4da;
+}
+
+.submit-btn {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.submit-btn:hover {
+    background-color: #f39c38;
+}
+
+/* 로딩 스피너 */
+.loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 0;
+}
+
+.loading-spinner i {
+    font-size: 48px;
+    color: var(--primary-color);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* 에러 메시지 */
+.error-message {
+    text-align: center;
+    padding: 30px;
+    color: var(--error-color);
+    background-color: var(--secondary-color);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.error-message i {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+/* 빈 일정 메시지 */
+.empty-itinerary {
+    text-align: center;
+    padding: 50px 0;
+    color: var(--dark-gray);
+    background-color: var(--secondary-color);
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+}
+
+.empty-itinerary:hover {
+    box-shadow: var(--hover-shadow);
+}
+
+.empty-itinerary i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    color: var(--medium-gray);
+}
+
+/* 인쇄 스타일 */
+@media print {
+    body {
+        background-color: white;
+    }
+
+    .container {
+        margin: 0;
+        padding: 20px;
+        box-shadow: none;
+    }
+
+    .btn-container {
+        display: none;
+    }
+
+    .map-section {
+        display: none;
+    }
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+    .container {
+        margin: 20px 10px;
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .plan-overview {
+        flex-direction: column;
+    }
+
+    .plan-image-container {
+        max-width: 100%;
+    }
+
+    .plan-image {
+        height: 200px;
+    }
+
+    .plan-info {
+        grid-template-columns: 1fr;
+    }
+
+    .btn-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    h1 {
+        font-size: 1.6rem;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+    }
+} 

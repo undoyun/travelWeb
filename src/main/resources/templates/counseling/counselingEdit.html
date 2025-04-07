@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문의 수정 | ワクワク</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <style>
+        :root {
+            --busan-color: #0080c6;
+            /* 부산 대표 색상 */
+            --busan-light: #e6f4ff;
+            --busan-dark: #005a8c;
+            --busan-accent: #ffc107;
+            /* 강조 색상 */
+            --secondary-color: #ffffff;
+            --text-color: #343a40;
+            --text-light: #868e96;
+            --background-color: #f8f9fa;
+            --border-color: #dee2e6;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 30px auto;
+        }
+
+        /* 페이지 네비게이션 */
+        .page-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--busan-light);
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--busan-dark);
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .page-title::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 5px;
+            height: 70%;
+            background: linear-gradient(to bottom, var(--busan-color), var(--busan-dark));
+            border-radius: 3px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--busan-light);
+            color: var(--busan-dark);
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .back-link:hover {
+            background-color: var(--busan-color);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 128, 198, 0.2);
+        }
+
+        .back-link i {
+            margin-right: 0.5rem;
+        }
+
+        /* 폼 컨테이너 */
+        .edit-form-container {
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, white 0%, var(--busan-light) 100%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--busan-dark);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .form-header h2 i {
+            color: var(--busan-color);
+        }
+
+        .form-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: white;
+            font-family: inherit;
+        }
+
+        .form-control:hover {
+            border-color: var(--busan-light);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--busan-color);
+            box-shadow: 0 0 0 4px var(--busan-light);
+        }
+
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 1rem center;
+            background-repeat: no-repeat;
+            background-size: 1.25rem;
+            padding-right: 2.5rem;
+        }
+
+        textarea.form-control {
+            min-height: 200px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            background-color: var(--background-color);
+        }
+
+        /* 버튼 */
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background-color: var(--busan-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--busan-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 128, 198, 0.2);
+        }
+
+        .btn-secondary {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--busan-light);
+            border-color: var(--busan-light);
+            color: var(--busan-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                margin: 20px auto;
+            }
+            
+            .page-navigation {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .form-header, 
+            .form-body {
+                padding: 1.2rem;
+            }
+
+            .form-footer {
+                padding: 1.2rem;
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 네비게이션 바 포함 -->
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <div class="container">
+        <!-- 페이지 네비게이션 -->
+        <div class="page-navigation">
+            <h1 class="page-title">문의 수정</h1>
+            <a th:href="@{/counseling/{id}(id=${counseling.id})}" class="back-link">
+                <i class="fas fa-arrow-left"></i> 상세페이지로 돌아가기
+            </a>
+        </div>
+
+        <div class="edit-form-container">
+            <div class="form-header">
+                <h2>
+                    <i class="fas fa-edit"></i>
+                    문의 내용 수정
+                </h2>
+            </div>
+
+            <form th:action="@{/counseling/edit/{id}(id=${counseling.id})}" method="post">
+                <div class="form-body">
+                    <div class="form-group">
+                        <label for="category" class="form-label">문의 유형</label>
+                        <select id="category" name="category" class="form-control" required>
+                            <option value="">문의 유형을 선택해주세요</option>
+                            <option th:each="cat : ${categories}"
+                                    th:value="${cat}"
+                                    th:text="${cat.displayName}"
+                                    th:selected="${cat == counseling.category}">
+                                카테고리
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="title" class="form-label">제목</label>
+                        <input type="text" id="title" name="title" class="form-control" 
+                            th:value="${counseling.title}" required
+                            placeholder="문의 제목을 입력해주세요">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content" class="form-label">문의 내용</label>
+                        <textarea id="content" name="content" class="form-control" 
+                                required th:text="${counseling.content}"
+                                placeholder="문의하실 내용을 자세히 작성해주세요"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <a th:href="@{/counseling/{id}(id=${counseling.id})}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        취소
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i>
+                        수정 완료
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:src="@{/js/main/nav.js}"></script>
+</body>
+
+</html> 

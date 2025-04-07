@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리뷰 상세 | ワクワク</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/reviews/reviewDetail.css}">
+</head>
+
+<body>
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <div class="container">
+        <!-- 페이지 네비게이션 -->
+        <div class="page-navigation">
+            <h1 class="page-title">여행 리뷰 상세보기</h1>
+            <div class="board-navigation">
+                <a th:href="@{/reviews/list}" class="back-link">
+                    <i class="fas fa-list"></i> 목록으로 돌아가기
+                </a>
+            </div>
+        </div>
+
+        <!-- 알림 메시지 영역 -->
+        <div class="alert alert-success" th:if="${successMessage}" th:text="${successMessage}"
+            style="margin-bottom: 1rem; padding: 1rem; background-color: #d4edda; color: #155724; border-radius: 0.25rem; border: 1px solid #c3e6cb;">
+        </div>
+        <div class="alert alert-danger" th:if="${errorMessage}" th:text="${errorMessage}"
+            style="margin-bottom: 1rem; padding: 1rem; background-color: #f8d7da; color: #721c24; border-radius: 0.25rem; border: 1px solid #f5c6cb;">
+        </div>
+
+        <!-- 게시물 컨테이너 -->
+        <div class="board-container">
+            <!-- 게시물 헤더 -->
+            <div class="post-header">
+                <div class="post-category" th:text="${review.destination}">해운대</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h1 class="post-title" th:text="${review.title}">리뷰 제목</h1>
+                    <div class="post-control-buttons" th:if="${review.isAuthor}"
+                        style="margin-left: 1rem; display: flex; gap: 0.5rem;">
+                        <a th:href="@{/reviews/edit/{id}(id=${review.id})}" class="btn btn-edit"
+                            style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                            <i class="fas fa-edit"></i> 수정
+                        </a>
+                        <form th:action="@{/reviews/{id}/delete(id=${review.id})}" method="post"
+                            style="display: inline;">
+                            <button type="submit" class="btn btn-delete"
+                                style="padding: 0.5rem 1rem; font-size: 0.9rem;"
+                                onclick="return confirm('정말 이 리뷰를 삭제하시겠습니까?')">
+                                <i class="fas fa-trash-alt"></i> 삭제
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <div class="post-meta">
+                    <div class="post-author">
+                        <div class="author-avatar" th:text="${review.userInitial}">K</div>
+                        <div class="author-info">
+                            <div class="author-name" th:text="${review.userName}">김여행</div>
+                            <div class="post-date" th:text="${#temporals.format(review.createdAt, 'yyyy년 MM월 dd일')}">
+                                2023-05-12</div>
+                        </div>
+                    </div>
+                    <div class="post-stats">
+                        <div class="post-stat">
+                            <i class="fas fa-eye"></i>
+                            <span th:text="${review.viewCount != null ? review.viewCount : 0}">0</span>
+                        </div>
+                        <div class="post-stat">
+                            <i class="fas fa-comment"></i>
+                            <span th:text="${review.commentCount}">5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 게시물 컨텐츠 -->
+            <div class="post-content">
+                <!-- 별점 표시 -->
+                <div class="post-rating">
+                    <div class="rating-stars">
+                        <th:block th:each="i : ${#numbers.sequence(1, 5)}">
+                            <i class="fas fa-star" th:if="${i <= review.rating}"></i>
+                            <i class="far fa-star" th:unless="${i <= review.rating}"></i>
+                        </th:block>
+                    </div>
+                    <span th:text="${review.rating} + '점'">5점</span>
+                </div>
+
+                <!-- 이미지 갤러리 -->
+                <div class="post-images" th:if="${review.images != null && !review.images.isEmpty()}">
+                    <div class="post-image" th:each="image : ${review.images}">
+                        <img th:src="${image}" alt="리뷰 이미지" onclick="openImageModal(this.src)">
+                    </div>
+                </div>
+
+                <!-- 본문 내용 -->
+                <div class="post-text" th:text="${review.content}">리뷰 내용이 여기에 표시됩니다.</div>
+
+                <!-- 태그 영역 -->
+                <div class="post-tags" th:if="${review.tags != null && !review.tags.isEmpty()}">
+                    <span class="tag" th:each="tag : ${review.tags}" th:text="${tag}">태그</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 댓글 섹션 -->
+        <div class="comments-section">
+            <div class="comments-header">
+                <h2 class="comments-title">댓글</h2>
+                <span class="comment-count" th:text="${review.commentCount + '개의 댓글'}">5개의 댓글</span>
+            </div>
+
+            <div class="comment-form" th:if="${#authorization.expression('isAuthenticated()')}">
+                <form th:action="@{/comments/reviews/{reviewId}(reviewId=${review.id})}" method="post">
+                    <textarea class="comment-input" id="commentContent" name="content"
+                        placeholder="여행 후기에 대한 의견이나 질문을 남겨보세요..."></textarea>
+                    <button type="submit" class="comment-submit">댓글 등록</button>
+                    <div style="clear:both;"></div>
+                </form>
+            </div>
+
+            <div class="comment-form" th:unless="${#authorization.expression('isAuthenticated()')}"
+                style="text-align: center; padding: 1rem 0;">
+                <p style="color: var(--text-light);">댓글을 작성하려면 <a th:href="@{/login}"
+                        style="color: var(--busan-color); font-weight: 500;">로그인</a>이 필요합니다.</p>
+            </div>
+
+            <div class="comments-list">
+                <!-- 댓글 목록 -->
+                <div th:if="${review.comments.isEmpty()}" class="empty-comments">
+                    <i class="far fa-comment-dots"></i>
+                    <p>아직 댓글이 없습니다. 첫 번째 댓글을 작성해보세요!</p>
+                </div>
+
+                <div th:each="comment : ${review.comments}" class="comment-item" th:id="'comment-' + ${comment.id}">
+                    <div class="comment-header">
+                        <div class="comment-author">
+                            <div class="comment-avatar" th:text="${comment.userInitial}">U</div>
+                            <div class="comment-author-info">
+                                <span class="comment-author-name" th:text="${comment.userName}">사용자</span>
+                                <span class="comment-date"
+                                    th:text="${#temporals.format(comment.createdAt, 'yyyy년 MM월 dd일 HH:mm')}">2023년 5월
+                                    10일</span>
+                            </div>
+                        </div>
+                        <div class="comment-actions" th:if="${comment.isAuthor}">
+                            <button class="comment-action" th:onclick="'showEditForm(' + ${comment.id} + ')'"
+                                style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background-color: var(--busan-light); color: var(--busan-dark); border-radius: 20px; border: none;">
+                                <i class="fas fa-edit"></i> 수정
+                            </button>
+                            <form th:action="@{/comments/{commentId}/delete(commentId=${comment.id})}" method="post"
+                                style="display: inline;">
+                                <input type="hidden" name="reviewId" th:value="${review.id}" />
+                                <button type="submit" class="comment-action"
+                                    style="padding: 0.4rem 0.8rem; font-size: 0.85rem; background-color: #ffeeee; color: #e74c3c; border-radius: 20px; border: none;"
+                                    onclick="return confirm('정말 이 댓글을 삭제하시겠습니까?')">
+                                    <i class="fas fa-trash-alt"></i> 삭제
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:id="'comment-content-' + ${comment.id}">
+                        <p class="comment-text" th:text="${comment.content}">댓글 내용</p>
+                    </div>
+                    <div th:id="'edit-form-' + ${comment.id}" style="display: none;">
+                        <form th:action="@{/comments/{commentId}/update(commentId=${comment.id})}" method="post">
+                            <input type="hidden" name="reviewId" th:value="${review.id}" />
+                            <textarea class="comment-input" name="content" th:text="${comment.content}"></textarea>
+                            <div style="text-align: right; margin-top: 10px;">
+                                <button type="button"
+                                    style="padding: 0.5rem 1rem; font-size: 0.9rem; background-color: var(--background-color); color: var(--text-color); border-radius: 20px; border: none; cursor: pointer;"
+                                    th:onclick="'hideEditForm(' + ${comment.id} + ')'">취소</button>
+                                <button type="submit"
+                                    style="padding: 0.5rem 1rem; font-size: 0.9rem; background-color: var(--busan-color); color: white; border-radius: 20px; border: none; cursor: pointer; margin-left: 0.5rem;">수정
+                                    완료</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 이미지 모달 -->
+    <div id="imageModal" class="modal">
+        <span class="close-modal" onclick="closeImageModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const reviewId = /*[[${review.id}]]*/0;
+
+        // 이미지 모달 관련 함수
+        function openImageModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // 댓글 수정 폼 표시/숨김 함수
+        function showEditForm(commentId) {
+            document.getElementById('comment-content-' + commentId).style.display = 'none';
+            document.getElementById('edit-form-' + commentId).style.display = 'block';
+        }
+
+        function hideEditForm(commentId) {
+            document.getElementById('comment-content-' + commentId).style.display = 'block';
+            document.getElementById('edit-form-' + commentId).style.display = 'none';
+        }
+
+        // ESC 키로 모달 닫기
+        window.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeImageModal();
+            }
+        });
+        /*]]>*/
+    </script>
+    <script th:src="@{/js/main/nav.js}"></script>
+</body>
+
+</html>

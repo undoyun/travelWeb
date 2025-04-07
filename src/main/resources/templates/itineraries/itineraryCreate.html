@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ワクワク:여행 일정 생성</title>
+    <!-- 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <!-- 아이콘용(폰트어썸) CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        integrity="sha512-acmXf6X10CqU2tyNYL/v7+YjFGv1IMZBCqYCK4RFY5cfkNdxdK2wLDMA4dlVaR49kWuSnA5W0/4aAMUyQXo1ww=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- CSS 파일 연결 -->
+    <link rel="stylesheet" th:href="@{/css/itineraries/itineraryCreate.css}">
+    <style>
+        /* 시간 선택 컨테이너 스타일 */
+        .time-selection-container {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0;
+            gap: 20px;
+        }
+        
+        .time-selection-container .form-group {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .time-selection-container .form-group:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .time-selection-container label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+        
+        .time-selection-container input[type="time"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 16px;
+            color: #495057;
+            background-color: #fff;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .time-selection-container input[type="time"]:focus {
+            border-color: #4dabf7;
+            box-shadow: 0 0 0 0.2rem rgba(77, 171, 247, 0.25);
+            outline: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .time-selection-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>여행 일정 생성</h1>
+
+        <!-- 진행 상태 표시 -->
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="progress-step active" id="step-indicator-1">1
+                    <span class="progress-step-label">목적지/날짜</span>
+                </div>
+                <div class="progress-step" id="step-indicator-2">2
+                    <span class="progress-step-label">교통 수단</span>
+                </div>
+                <div class="progress-step" id="step-indicator-3">3
+                    <span class="progress-step-label">여행 목적</span>
+                </div>
+                <div class="progress-step" id="step-indicator-4">4
+                    <span class="progress-step-label">예산/밀도</span>
+                </div>
+                <div class="progress-step" id="step-indicator-5">5
+                    <span class="progress-step-label">숙소/이동</span>
+                </div>
+                <div class="progress-step" id="step-indicator-6">6
+                    <span class="progress-step-label">확인</span>
+                </div>
+            </div>
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <!-- Step 1: 출발지/목적지 + 2개월 달력 -->
+        <div class="step active" id="step1">
+            <h2><i class="fas fa-map-marked-alt"></i> 목적지 및 날짜 선택</h2>
+            <div class="form-group">
+                <label for="departLocation">출발지</label>
+                <input type="text" id="departLocation" placeholder="예: 서울" required />
+                <div class="error-message" id="departLocationError"></div>
+            </div>
+            <div class="form-group">
+                <label for="destination">목적지</label>
+                <input type="text" id="destination" placeholder="예: 오사카" required />
+                <div class="error-message" id="destinationError"></div>
+            </div>
+            <p style="text-align:center; color:#7f8c8d; margin-bottom: 20px;">
+                * 여행 기간(여행지 도착 날짜, 여행지 출발 날짜)을 선택해 주세요.
+            </p>
+            <!-- 2개월 달력 -->
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button id="prevBtn" class="arrow-btn">&lt;</button>
+                    <div class="month-year" id="monthYearLabel"></div>
+                    <button id="nextBtn" class="arrow-btn">&gt;</button>
+                </div>
+                <div class="calendars">
+                    <div class="calendar">
+                        <table class="calendar-table" id="calendar1">
+                            <thead>
+                                <tr>
+                                    <th>일</th>
+                                    <th>월</th>
+                                    <th>화</th>
+                                    <th>수</th>
+                                    <th>목</th>
+                                    <th>금</th>
+                                    <th>토</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div class="calendar">
+                        <table class="calendar-table" id="calendar2">
+                            <thead>
+                                <tr>
+                                    <th>일</th>
+                                    <th>월</th>
+                                    <th>화</th>
+                                    <th>수</th>
+                                    <th>목</th>
+                                    <th>금</th>
+                                    <th>토</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="error-message" id="dateError"></div>
+            </div>
+            
+            <!-- 출발/도착 시간 선택 -->
+            <div class="time-selection-container">
+                <div class="form-group">
+                    <label for="departureTime">출발 시간</label>
+                    <input type="time" id="departureTime" value="09:00" required />
+                    <div class="error-message" id="departureTimeError"></div>
+                </div>
+                <div class="form-group">
+                    <label for="returnTime">도착 시간</label>
+                    <input type="time" id="returnTime" value="18:00" required />
+                    <div class="error-message" id="returnTimeError"></div>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn" type="button" onclick="goNextFromStep1()">다음</button>
+            </div>
+        </div>
+
+        <!-- Step 2: 교통 수단 선택 -->
+        <div class="step" id="step2">
+            <h2><i class="fas fa-plane"></i> 교통 수단 선택</h2>
+            <div class="transportation-options">
+                <div class="transport-box" data-value="비행기" onclick="selectTransportation(this)">
+                    <div class="transport-img">
+                        <img src="/img/itineraries/transportation/plane.png" alt="비행기">
+                    </div>
+                    <span>비행기</span>
+                </div>
+                <div class="transport-box" data-value="기차" onclick="selectTransportation(this)">
+                    <div class="transport-img">
+                        <img src="/img/itineraries/transportation/train.png" alt="기차">
+                    </div>
+                    <span>기차</span>
+                </div>
+                <div class="transport-box" data-value="버스" onclick="selectTransportation(this)">
+                    <div class="transport-img">
+                        <img src="/img/itineraries/transportation/bus.png" alt="버스">
+                    </div>
+                    <span>버스</span>
+                </div>
+                <div class="transport-box" data-value="자동차" onclick="selectTransportation(this)">
+                    <div class="transport-img">
+                        <img src="/img/itineraries/transportation/car.png" alt="자동차">
+                    </div>
+                    <span>자동차</span>
+                </div>
+                <div class="transport-box" data-value="배" onclick="selectTransportation(this)">
+                    <div class="transport-img">
+                        <img src="/img/itineraries/transportation/ship.png" alt="배">
+                    </div>
+                    <span>배</span>
+                </div>
+                <div class="transport-box" data-value="자전거" onclick="selectTransportation(this)">
+                    <div class="transport-img">
+                        <img src="/img/itineraries/transportation/bicycle.png" alt="자전거">
+                    </div>
+                    <span>자전거</span>
+                </div>
+            </div>
+            <div class="error-message" id="transportationError"></div>
+            <div class="btn-container">
+                <button class="btn back-btn" type="button" onclick="prevStep()">이전</button>
+                <button class="btn" type="button" onclick="nextStep()">다음</button>
+            </div>
+        </div>
+
+        <!-- Step 3: 여행 목적 선택 -->
+        <div class="step" id="step3">
+            <h2><i class="fas fa-bullseye"></i> 여행 목적 선택</h2>
+            <div class="purpose-options">
+                <div class="purpose-box" data-value="관광" onclick="selectPurpose(this)">
+                    <img src="https://images.unsplash.com/photo-1526495124232-a04e1849168c" alt="관광" />
+                    <span>관광</span>
+                </div>
+                <div class="purpose-box" data-value="휴양" onclick="selectPurpose(this)">
+                    <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef" alt="휴양" />
+                    <span>휴양</span>
+                </div>
+                <div class="purpose-box" data-value="맛집 탐방" onclick="selectPurpose(this)">
+                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836" alt="맛집 탐방" />
+                    <span>맛집 탐방</span>
+                </div>
+                <div class="purpose-box" data-value="쇼핑" onclick="selectPurpose(this)">
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b" alt="쇼핑" />
+                    <span>쇼핑</span>
+                </div>
+                <div class="purpose-box" data-value="자연 탐험" onclick="selectPurpose(this)">
+                    <img src="https://images.unsplash.com/photo-1501555088652-021faa106b9b" alt="자연 탐험" />
+                    <span>자연 탐험</span>
+                </div>
+                <div class="purpose-box" data-value="애니메이션" onclick="selectPurpose(this)">
+                    <img src="https://images.unsplash.com/photo-1578632292335-df3abbb0d586" alt="애니메이션" />
+                    <span>애니메이션</span>
+                </div>
+            </div>
+            <div class="error-message" id="purposeError"></div>
+            <div class="btn-container">
+                <button class="btn back-btn" type="button" onclick="prevStep()">이전</button>
+                <button class="btn" type="button" onclick="nextStep()">다음</button>
+            </div>
+        </div>
+
+        <!-- Step 4: 예산 입력 및 여행 밀도 선택 -->
+        <div class="step" id="step4">
+            <h2><i class="fas fa-wallet"></i> 예산 입력</h2>
+            <div class="budget-container">
+                <div class="budget-slider-container">
+                    <input type="range" id="budgetSlider" min="0" max="2000000" step="50000" value="500000" class="budget-slider">
+                    <div class="budget-marks">
+                        <span>0원</span>
+                        <span>100만원</span>
+                        <span>200만원</span>
+                    </div>
+                </div>
+                <div class="budget-input-container">
+                    <input type="number" id="budget" placeholder="예: 500000" value="500000" />
+                    <span class="budget-currency">원</span>
+                </div>
+            </div>
+            <div class="error-message" id="budgetError"></div>
+
+            <h2><i class="fas fa-tachometer-alt"></i> 여행 밀도 선택</h2>
+            <div class="density-options">
+                <div class="density-box" data-value="여유롭게" onclick="selectDensity(this)">
+                    <div class="density-icon">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <div class="density-content">
+                        <h3>여유롭게</h3>
+                        <p>하루 2~3곳 방문, 충분한 휴식 시간</p>
+                    </div>
+                </div>
+                <div class="density-box" data-value="적당히" onclick="selectDensity(this)">
+                    <div class="density-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="density-content">
+                        <h3>적당히</h3>
+                        <p>하루 3~5곳 방문, 균형 잡힌 일정</p>
+                    </div>
+                </div>
+                <div class="density-box" data-value="빡빡하게" onclick="selectDensity(this)">
+                    <div class="density-icon">
+                        <i class="fas fa-running"></i>
+                    </div>
+                    <div class="density-content">
+                        <h3>빡빡하게</h3>
+                        <p>하루 5곳 이상 방문, 최대한 많은 곳 경험</p>
+                    </div>
+                </div>
+            </div>
+            <div class="error-message" id="densityError"></div>
+            <div class="btn-container">
+                <button class="btn back-btn" type="button" onclick="prevStep()">이전</button>
+                <button class="btn" type="button" onclick="goNextFromStep4()">다음</button>
+            </div>
+        </div>
+
+        <!-- Step 5: 숙소 및 이동 방식 -->
+        <div class="step" id="step5">
+            <h2><i class="fas fa-hotel"></i> 숙소 및 이동 방식</h2>
+            <div class="form-group">
+                <label for="hotelLocation">숙소 위치</label>
+                <input type="text" id="hotelLocation" placeholder="예: 도톤보리 근처" oninput="updateHotelLocation(this.value)" />
+            </div>
+
+            <h2><i class="fas fa-walking"></i> 현지 이동 방식 선택</h2>
+            <div class="travel-mode-options">
+                <div class="travel-mode-box" data-value="도보" onclick="selectTravelMode(this)">
+                    <i class="fas fa-walking"></i>
+                    <span>도보</span>
+                </div>
+                <div class="travel-mode-box" data-value="대중교통" onclick="selectTravelMode(this)">
+                    <i class="fas fa-subway"></i>
+                    <span>대중교통</span>
+                </div>
+                <div class="travel-mode-box" data-value="렌터카" onclick="selectTravelMode(this)">
+                    <i class="fas fa-car"></i>
+                    <span>렌터카</span>
+                </div>
+                <div class="travel-mode-box" data-value="택시" onclick="selectTravelMode(this)">
+                    <i class="fas fa-taxi"></i>
+                    <span>택시</span>
+                </div>
+            </div>
+            <div class="error-message" id="travelModeError"></div>
+            <div class="btn-container">
+                <button class="btn back-btn" type="button" onclick="prevStep()">이전</button>
+                <button class="btn" type="button" onclick="nextStep()">다음</button>
+            </div>
+        </div>
+
+        <!-- Step 6: 최종 확인 및 제출 -->
+        <div class="step" id="step6">
+            <h2><i class="fas fa-check-circle"></i> 입력 완료</h2>
+            <p>선택한 여행 정보를 확인하세요.</p>
+            <div id="summary"></div>
+            <div class="btn-container">
+                <button class="btn back-btn" type="button" onclick="prevStep()">이전</button>
+                <button class="btn submit-btn" type="button" onclick="submitPlan()">여행 계획 생성하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 로딩 스피너 -->
+    <div class="loading" id="loading">
+        <div class="loading-spinner"></div>
+        <p style="margin-top: 20px; font-weight: 500;">여행 계획을 생성 중입니다...</p>
+    </div>
+
+    <script>
+        // 전역 변수
+        let currentStep = 1;
+        let selectedStartDate = null;
+        let selectedEndDate = null;
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+
+        // 여행 정보 객체
+        const travelPlan = {
+            departLocation: '',
+            destination: '',
+            startDate: '',
+            endDate: '',
+            departureTime: '',
+            returnTime: '',
+            transportation: '',
+            purpose: '',
+            budget: 0,
+            density: '',
+            hotelLocation: '',
+            travelMode: ''
+        };
+
+        // 페이지 로드 시 실행
+        document.addEventListener('DOMContentLoaded', function () {
+            renderCalendars();
+            updateMonthYearLabel();
+            updateProgressBar();
+        });
+
+        // 진행 상태 표시 업데이트
+        function updateProgressBar() {
+            // 진행 단계 표시기 업데이트
+            for (let i = 1; i <= 6; i++) {
+                const indicator = document.getElementById(`step-indicator-${i}`);
+                if (i < currentStep) {
+                    indicator.classList.remove('active');
+                    indicator.classList.add('completed');
+                } else if (i === currentStep) {
+                    indicator.classList.add('active');
+                    indicator.classList.remove('completed');
+                } else {
+                    indicator.classList.remove('active');
+                    indicator.classList.remove('completed');
+                }
+            }
+
+            // 진행 바 업데이트
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercentage = ((currentStep - 1) / 5) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+
+        // 달력 렌더링 함수
+        function renderCalendars() {
+            // 첫 번째 달력 (현재 월)
+            renderCalendar(currentYear, currentMonth, 'calendar1');
+
+            // 두 번째 달력 (다음 월)
+            let nextMonth = currentMonth + 1;
+            let nextYear = currentYear;
+            if (nextMonth > 11) {
+                nextMonth = 0;
+                nextYear++;
+            }
+            renderCalendar(nextYear, nextMonth, 'calendar2');
+        }
+
+        // 단일 달력 렌더링 함수
+        function renderCalendar(year, month, calendarId) {
+            const calendar = document.getElementById(calendarId);
+            const tbody = calendar.querySelector('tbody');
+            tbody.innerHTML = '';
+
+            // 해당 월의 첫 날과 마지막 날
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+
+            // 첫 날의 요일 (0: 일요일, 6: 토요일)
+            const firstDayIndex = firstDay.getDay();
+
+            // 오늘 날짜
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // 달력 행 생성
+            let date = 1;
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('tr');
+
+                // 달력 열 생성
+                for (let j = 0; j < 7; j++) {
+                    const cell = document.createElement('td');
+
+                    if (i === 0 && j < firstDayIndex) {
+                        // 이전 달의 날짜
+                        cell.classList.add('empty');
+                    } else if (date > lastDay.getDate()) {
+                        // 다음 달의 날짜
+                        cell.classList.add('empty');
+                    } else {
+                        // 현재 달의 날짜
+                        cell.textContent = date;
+                        const currentDate = new Date(year, month, date);
+                        cell.dataset.date = `${year}-${String(month + 1).padStart(2, '0')}-${String(date).padStart(2, '0')}`;
+
+                        // 오늘 날짜 표시
+                        if (currentDate.getTime() === today.getTime()) {
+                            cell.classList.add('today');
+                        }
+
+                        // 오늘 이전 날짜는 비활성화
+                        if (currentDate < today) {
+                            cell.classList.add('disabled');
+                        } else {
+                            // 선택된 날짜 표시
+                            if (selectedStartDate && selectedEndDate) {
+                                const cellDate = new Date(year, month, date);
+                                const startDate = new Date(selectedStartDate);
+                                const endDate = new Date(selectedEndDate);
+
+                                if (cellDate.toDateString() === startDate.toDateString()) {
+                                    cell.classList.add('selected');
+                                    cell.classList.add('range-start');
+                                } else if (cellDate.toDateString() === endDate.toDateString()) {
+                                    cell.classList.add('selected');
+                                    cell.classList.add('range-end');
+                                } else if (cellDate > startDate && cellDate < endDate) {
+                                    cell.classList.add('in-range');
+                                }
+                            } else if (selectedStartDate) {
+                                const cellDate = new Date(year, month, date);
+                                const startDate = new Date(selectedStartDate);
+
+                                if (cellDate.toDateString() === startDate.toDateString()) {
+                                    cell.classList.add('selected');
+                                    cell.classList.add('range-start');
+                                    cell.classList.add('range-end');
+                                }
+                            }
+
+                            // 날짜 클릭 이벤트
+                            cell.addEventListener('click', function () {
+                                selectDate(this.dataset.date);
+                            });
+                        }
+
+                        date++;
+                    }
+
+                    row.appendChild(cell);
+                }
+
+                tbody.appendChild(row);
+
+                // 모든 날짜를 표시했으면 반복 종료
+                if (date > lastDay.getDate()) {
+                    break;
+                }
+            }
+        }
+
+        // 월/년 레이블 업데이트
+        function updateMonthYearLabel() {
+            const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'];
+            let nextMonth = currentMonth + 1;
+            let nextYear = currentYear;
+            if (nextMonth > 11) {
+                nextMonth = 0;
+                nextYear++;
+            }
+
+            document.getElementById('monthYearLabel').textContent =
+                `${currentYear}년 ${monthNames[currentMonth]} - ${nextYear}년 ${monthNames[nextMonth]}`;
+        }
+
+        // 이전 달로 이동
+        document.getElementById('prevBtn').addEventListener('click', function () {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendars();
+            updateMonthYearLabel();
+        });
+
+        // 다음 달로 이동
+        document.getElementById('nextBtn').addEventListener('click', function () {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendars();
+            updateMonthYearLabel();
+        });
+
+        // 날짜 선택 함수
+        function selectDate(dateStr) {
+            const selectedDate = new Date(dateStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // 오늘 이전 날짜는 선택 불가
+            if (selectedDate < today) {
+                document.getElementById('dateError').textContent = '오늘 이후 날짜만 선택 가능합니다.';
+                return;
+            }
+
+            document.getElementById('dateError').textContent = '';
+
+            if (!selectedStartDate || (selectedStartDate && selectedEndDate)) {
+                // 새로운 선택 시작
+                selectedStartDate = dateStr;
+                selectedEndDate = null;
+            } else {
+                // 선택 종료
+                const startDate = new Date(selectedStartDate);
+
+                if (selectedDate < startDate) {
+                    // 시작일보다 이전 날짜 선택 시 시작일을 변경
+                    selectedStartDate = dateStr;
+                } else {
+                    selectedEndDate = dateStr;
+                }
+            }
+
+            renderCalendars();
+        }
+
+        // 다음 단계로 이동 (Step 1에서 사용)
+        function goNextFromStep1() {
+            // 출발지, 목적지, 날짜 유효성 검사
+            let isValid = true;
+
+            const departLocation = document.getElementById('departLocation').value.trim();
+            if (!departLocation) {
+                document.getElementById('departLocationError').textContent = '출발지를 입력해주세요.';
+                isValid = false;
+            } else {
+                document.getElementById('departLocationError').textContent = '';
+                travelPlan.departLocation = departLocation;
+            }
+
+            const destination = document.getElementById('destination').value.trim();
+            if (!destination) {
+                document.getElementById('destinationError').textContent = '목적지를 입력해주세요.';
+                isValid = false;
+            } else {
+                document.getElementById('destinationError').textContent = '';
+                travelPlan.destination = destination;
+            }
+
+            if (!selectedStartDate || !selectedEndDate) {
+                document.getElementById('dateError').textContent = '여행 기간을 선택해주세요.';
+                isValid = false;
+            } else {
+                document.getElementById('dateError').textContent = '';
+                travelPlan.startDate = selectedStartDate;
+                travelPlan.endDate = selectedEndDate;
+            }
+            
+            // 출발/도착 시간 값 저장
+            const departureTime = document.getElementById('departureTime').value;
+            if (!departureTime) {
+                document.getElementById('departureTimeError').textContent = '출발 시간을 입력해주세요.';
+                isValid = false;
+            } else {
+                document.getElementById('departureTimeError').textContent = '';
+                travelPlan.departureTime = departureTime;
+            }
+            
+            const returnTime = document.getElementById('returnTime').value;
+            if (!returnTime) {
+                document.getElementById('returnTimeError').textContent = '도착 시간을 입력해주세요.';
+                isValid = false;
+            } else {
+                document.getElementById('returnTimeError').textContent = '';
+                travelPlan.returnTime = returnTime;
+            }
+
+            if (isValid) {
+                nextStep();
+            }
+        }
+
+        // 다음 단계로 이동 (Step 4에서 사용)
+        function goNextFromStep4() {
+            // 예산 유효성 검사
+            let isValid = true;
+
+            const budget = document.getElementById('budget').value.trim();
+            if (!budget || isNaN(budget) || parseInt(budget) < 0) {
+                document.getElementById('budgetError').textContent = '유효한 예산을 입력해주세요.';
+                isValid = false;
+            } else {
+                document.getElementById('budgetError').textContent = '';
+                travelPlan.budget = parseInt(budget);
+            }
+
+            if (!travelPlan.density) {
+                document.getElementById('densityError').textContent = '여행 밀도를 선택해주세요.';
+                isValid = false;
+            } else {
+                document.getElementById('densityError').textContent = '';
+            }
+
+            if (isValid) {
+                nextStep();
+            }
+        }
+
+        // 교통 수단 선택
+        function selectTransportation(element) {
+            document.querySelectorAll('.transport-box').forEach(box => {
+                box.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            travelPlan.transportation = element.dataset.value;
+            document.getElementById('transportationError').textContent = '';
+        }
+
+        // 여행 목적 선택
+        function selectPurpose(element) {
+            document.querySelectorAll('.purpose-box').forEach(box => {
+                box.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            travelPlan.purpose = element.dataset.value;
+            document.getElementById('purposeError').textContent = '';
+        }
+
+        // 여행 밀도 선택
+        function selectDensity(element) {
+            document.querySelectorAll('.density-box').forEach(box => {
+                box.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            travelPlan.density = element.dataset.value;
+            document.getElementById('densityError').textContent = '';
+        }
+
+        // 현지 이동 방식 선택
+        function selectTravelMode(element) {
+            document.querySelectorAll('.travel-mode-box').forEach(box => {
+                box.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            travelPlan.travelMode = element.dataset.value;
+            document.getElementById('travelModeError').textContent = '';
+        }
+
+        // 숙소 위치 업데이트
+        function updateHotelLocation(value) {
+            travelPlan.hotelLocation = value.trim();
+        }
+
+        // 다음 단계로 이동
+        function nextStep() {
+            // 현재 단계 유효성 검사
+            let isValid = true;
+
+            if (currentStep === 2 && !travelPlan.transportation) {
+                document.getElementById('transportationError').textContent = '교통 수단을 선택해주세요.';
+                isValid = false;
+            }
+
+            if (currentStep === 3 && !travelPlan.purpose) {
+                document.getElementById('purposeError').textContent = '여행 목적을 선택해주세요.';
+                isValid = false;
+            }
+
+            if (currentStep === 5 && !travelPlan.travelMode) {
+                document.getElementById('travelModeError').textContent = '현지 이동 방식을 선택해주세요.';
+                isValid = false;
+            }
+
+            if (isValid) {
+                // 현재 단계 숨기기
+                document.getElementById(`step${currentStep}`).classList.remove('active');
+
+                // 다음 단계 표시
+                currentStep++;
+                document.getElementById(`step${currentStep}`).classList.add('active');
+
+                // 진행 상태 업데이트
+                updateProgressBar();
+
+                // 마지막 단계에서 요약 정보 표시
+                if (currentStep === 6) {
+                    updateSummary();
+                }
+
+                // 페이지 상단으로 스크롤
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // 이전 단계로 이동
+        function prevStep() {
+            // 현재 단계 숨기기
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+
+            // 이전 단계 표시
+            currentStep--;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+
+            // 진행 상태 업데이트
+            updateProgressBar();
+
+            // 페이지 상단으로 스크롤
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 요약 정보 업데이트
+        function updateSummary() {
+            const summary = document.getElementById('summary');
+            summary.innerHTML = `
+                <h3>여행 정보 요약</h3>
+                <p><span>출발지:</span> <span>${travelPlan.departLocation}</span></p>
+                <p><span>목적지:</span> <span>${travelPlan.destination}</span></p>
+                <p><span>출발 날짜:</span> <span>${travelPlan.startDate}</span></p>
+                <p><span>출발 시간:</span> <span>${travelPlan.departureTime}</span></p>
+                <p><span>종료 날짜:</span> <span>${travelPlan.endDate}</span></p>
+                <p><span>도착 시간:</span> <span>${travelPlan.returnTime}</span></p>
+                <p><span>교통 수단:</span> <span>${travelPlan.transportation}</span></p>
+                <p><span>여행 목적:</span> <span>${travelPlan.purpose}</span></p>
+                <p><span>예산:</span> <span>${travelPlan.budget.toLocaleString()}원</span></p>
+                <p><span>여행 밀도:</span> <span>${travelPlan.density}</span></p>
+                <p><span>숙소 위치:</span> <span>${travelPlan.hotelLocation || '미지정'}</span></p>
+                <p><span>현지 이동 방식:</span> <span>${travelPlan.travelMode}</span></p>
+            `;
+        }
+
+        // 여행 계획 제출
+        function submitPlan() {
+            // 로딩 표시
+            document.getElementById('loading').style.display = 'flex';
+
+            // 폼 생성 및 제출
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/itineraries/itineraryCreate';
+
+            // 폼 필드 추가
+            for (const key in travelPlan) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = travelPlan[key];
+                form.appendChild(input);
+            }
+
+            // CSRF 토큰 추가 (Spring Security 사용 시)
+            const csrfToken = document.querySelector('meta[name="_csrf"]');
+            const csrfHeader = document.querySelector('meta[name="_csrf_header"]');
+
+            if (csrfToken && csrfHeader) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = csrfHeader.content;
+                csrfInput.value = csrfToken.content;
+                form.appendChild(csrfInput);
+            }
+
+            // 폼 제출
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // 예산 슬라이더 연동
+        document.addEventListener('DOMContentLoaded', function() {
+            const budgetSlider = document.getElementById('budgetSlider');
+            const budgetInput = document.getElementById('budget');
+
+            // 슬라이더 값이 변경될 때 입력 필드 업데이트
+            budgetSlider.addEventListener('input', function() {
+                budgetInput.value = this.value;
+            });
+
+            // 입력 필드 값이 변경될 때 슬라이더 업데이트
+            budgetInput.addEventListener('input', function() {
+                budgetSlider.value = this.value;
+            });
+        });
+    </script>
+</body>
+
+</html>

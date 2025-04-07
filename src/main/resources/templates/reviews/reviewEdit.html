@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>리뷰 수정 | ワクワク</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/main/main.css}">
+    <link rel="stylesheet" th:href="@{/css/main/nav.css}">
+    <link rel="stylesheet" th:href="@{/css/reviews/reviewEdit.css}">
+</head>
+
+<body>
+    <div th:replace="~{nav :: navbar}"></div>
+
+    <div class="container">
+        <a th:href="@{/reviews/{id}(id=${review.id})}" class="back-link">
+            <i class="fas fa-arrow-left"></i> 리뷰로 돌아가기
+        </a>
+
+        <div class="edit-form-container">
+            <div class="form-header">
+                <h1 class="form-title">리뷰 수정하기</h1>
+                <p class="form-subtitle">부산 여행에 대한 소중한 경험을 더 풍성하게 작성해보세요</p>
+            </div>
+
+            <div th:if="${message}" class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <span th:text="${message}"></span>
+            </div>
+
+            <div th:if="${error}" class="alert alert-danger">
+                <i class="fas fa-exclamation-circle"></i>
+                <span th:text="${error}"></span>
+            </div>
+
+            <form th:action="@{/reviews/update/{id}(id=${review.id})}" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="scheduleId" th:value="${review.scheduleId}">
+                <input type="hidden" name="destination" th:value="${review.destination}">
+                <input type="hidden" name="userId" th:value="${review.userId}">
+                <input type="hidden" name="userName" th:value="${review.userName}">
+                <input type="hidden" name="userInitial" th:value="${review.userInitial}">
+                <input type="hidden" id="removedImages" name="removedImages" value="">
+
+                <div class="form-group">
+                    <label for="title" class="form-label">리뷰 제목</label>
+                    <input type="text" class="form-control" id="title" name="title" th:value="${review.title}" required
+                        placeholder="여행지에서의 특별했던 경험을 요약해보세요">
+                </div>
+
+                <div class="rating-container">
+                    <span class="rating-label">여행 만족도</span>
+                    <div class="stars">
+                        <i class="fas fa-star star" data-rating="1"
+                            th:classappend="${review.rating >= 1 ? 'active' : ''}"></i>
+                        <i class="fas fa-star star" data-rating="2"
+                            th:classappend="${review.rating >= 2 ? 'active' : ''}"></i>
+                        <i class="fas fa-star star" data-rating="3"
+                            th:classappend="${review.rating >= 3 ? 'active' : ''}"></i>
+                        <i class="fas fa-star star" data-rating="4"
+                            th:classappend="${review.rating >= 4 ? 'active' : ''}"></i>
+                        <i class="fas fa-star star" data-rating="5"
+                            th:classappend="${review.rating >= 5 ? 'active' : ''}"></i>
+                    </div>
+                    <input type="hidden" name="rating" id="rating" th:value="${review.rating}">
+                </div>
+
+                <div class="form-group">
+                    <label for="content" class="form-label">리뷰 내용</label>
+                    <textarea class="form-control" id="content" name="content" required th:text="${review.content}"
+                        placeholder="방문한 장소, 먹었던 음식, 특별했던 순간 등 여행에서 기억에 남는 경험을 자세히 공유해보세요."></textarea>
+                </div>
+
+                <div class="image-container" th:if="${!review.images.isEmpty()}">
+                    <label class="form-label">현재 이미지</label>
+                    <div class="current-images" id="currentImages">
+                        <div th:each="image, status : ${review.images}" class="image-item"
+                            th:data-index="${status.index}">
+                            <img th:src="${image}" alt="리뷰 이미지">
+                            <span class="remove-image" th:onclick="'removeCurrentImage(' + ${status.index} + ')'">
+                                <i class="fas fa-times"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="upload-section">
+                    <label class="form-label">새로운 이미지 추가</label>
+                    <p class="form-text">
+                        최대 3장까지 업로드 가능합니다. 여행의 분위기를 잘 담은 사진을 선택해보세요. (JPG, PNG 파일)
+                    </p>
+                    <label for="photos" class="custom-file-upload">
+                        <i class="fas fa-camera"></i> 사진 선택하기
+                    </label>
+                    <input type="file" id="photos" name="photos" accept="image/*" multiple>
+                    <div class="preview-container" id="previewContainer"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="tags" class="form-label">태그</label>
+                    <input type="text" class="form-control" id="tags" name="tags"
+                        placeholder="쉼표로 구분하여 태그 입력 (예: 가성비여행,힐링,맛집탐방,부산명소)" th:value="${tagString}">
+                    <p class="form-text">태그를 추가하면 다른 여행자들이 리뷰를 더 쉽게 찾을 수 있어요.</p>
+                </div>
+
+                <div class="form-buttons">
+                    <a th:href="@{/reviews/{id}(id=${review.id})}" class="btn btn-cancel">
+                        <i class="fas fa-times"></i> 취소하기
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> 수정 완료
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // 별점 기능
+            const stars = document.querySelectorAll('.star');
+            const ratingInput = document.getElementById('rating');
+
+            stars.forEach(star => {
+                star.addEventListener('click', function () {
+                    const rating = this.getAttribute('data-rating');
+                    ratingInput.value = rating;
+
+                    // 별점 UI 업데이트
+                    stars.forEach(s => {
+                        if (s.getAttribute('data-rating') <= rating) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+
+                // 호버 효과 (마우스 오버 시 미리보기)
+                star.addEventListener('mouseover', function () {
+                    const rating = this.getAttribute('data-rating');
+
+                    stars.forEach(s => {
+                        if (s.getAttribute('data-rating') <= rating) {
+                            s.classList.add('hover');
+                        } else {
+                            s.classList.remove('hover');
+                        }
+                    });
+                });
+
+                star.addEventListener('mouseout', function () {
+                    stars.forEach(s => {
+                        s.classList.remove('hover');
+                    });
+                });
+            });
+
+            // 이미지 미리보기 기능
+            const photoInput = document.getElementById('photos');
+            const previewContainer = document.getElementById('previewContainer');
+            const removedImagesInput = document.getElementById('removedImages');
+            const removedImages = [];
+
+            photoInput.addEventListener('change', function () {
+                previewContainer.innerHTML = '';
+
+                if (this.files && this.files.length > 0) {
+                    const maxFiles = 3;
+                    const currentImagesCount = document.querySelectorAll('.image-item:not([style*="display: none"])').length;
+                    const allowedNewFiles = Math.max(0, maxFiles - currentImagesCount);
+
+                    if (this.files.length > allowedNewFiles) {
+                        alert(`최대 ${maxFiles}장까지 업로드 가능합니다. 현재 ${currentImagesCount}장이 있으므로 ${allowedNewFiles}장만 추가할 수 있습니다.`);
+                    }
+
+                    const filesArray = Array.from(this.files).slice(0, allowedNewFiles);
+
+                    filesArray.forEach((file, index) => {
+                        const reader = new FileReader();
+
+                        reader.onload = function (e) {
+                            const previewItem = document.createElement('div');
+                            previewItem.className = 'preview-item';
+
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+
+                            const removeButton = document.createElement('span');
+                            removeButton.className = 'remove-image';
+                            removeButton.innerHTML = '<i class="fas fa-times"></i>';
+
+                            removeButton.addEventListener('click', function () {
+                                previewItem.remove();
+                            });
+
+                            previewItem.appendChild(img);
+                            previewItem.appendChild(removeButton);
+                            previewContainer.appendChild(previewItem);
+                        };
+
+                        reader.readAsDataURL(file);
+                    });
+                }
+            });
+
+            // 기존 이미지 삭제 기능
+            window.removeCurrentImage = function (index) {
+                const imageItem = document.querySelector(`.image-item[data-index="${index}"]`);
+                if (imageItem) {
+                    // 삭제할 이미지 인덱스 저장
+                    removedImages.push(index);
+                    removedImagesInput.value = removedImages.join(',');
+
+                    // 화면에서 숨기기
+                    imageItem.style.display = 'none';
+                }
+            };
+
+            // 태그 입력 시 자동 쉼표 처리
+            const tagsInput = document.getElementById('tags');
+            tagsInput.addEventListener('keydown', function (e) {
+                if (e.key === ' ') {
+                    const value = this.value.trim();
+                    if (value && !value.endsWith(',')) {
+                        this.value = value + ',';
+                    }
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+    <script th:src="@{/js/main/nav.js}"></script>
+</body>
+
+</html>
