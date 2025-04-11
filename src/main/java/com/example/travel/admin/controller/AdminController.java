@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,7 +61,15 @@ public class AdminController {
 		// 최근 활동 로그
 		var recentActivities = activityLogService.getRecentActivities();
 
+		// 관리자 이름 (인증정보에서 가져오거나 기본값 사용)
+		String adminName = "관리자";
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication != null && authentication.isAuthenticated()) {
+			adminName = authentication.getName();
+		}
+
 		// 모델에 데이터 추가
+		model.addAttribute("adminName", adminName);
 		model.addAttribute("totalUsers", totalUsers);
 		model.addAttribute("totalSchedules", totalSchedules);
 		model.addAttribute("totalReviews", totalReviews);

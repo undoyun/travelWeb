@@ -87,14 +87,14 @@ public class InquiryService {
     @Transactional
     public Inquiry answerInquiry(Long inquiryId, String answer) {
         Inquiry inquiry = getInquiryById(inquiryId);
-        
+
         // 현재 인증된 관리자 정보 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             String adminUsername = authentication.getName();
             User admin = userRepository.findByUsername(adminUsername)
                     .orElseThrow(() -> new IllegalStateException("관리자 정보를 찾을 수 없습니다"));
-            
+
             inquiry.answer(answer, admin);
             return inquiryRepository.save(inquiry);
         } else {
@@ -120,6 +120,7 @@ public class InquiryService {
 
     /**
      * 전체 문의 수를 조회합니다.
+     * 
      * @return 전체 문의 수
      */
     public long getTotalInquiriesCount() {
@@ -128,9 +129,10 @@ public class InquiryService {
 
     /**
      * 미답변 문의 개수를 반환합니다.
+     * 
      * @return 미답변 문의 개수
      */
     public long getUnansweredInquiriesCount() {
         return inquiryRepository.countByIsAnswered(false);
     }
-} 
+}

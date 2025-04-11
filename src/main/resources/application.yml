@@ -18,3 +18,8 @@ spring:
   profiles:
     include:
       - oauth
+
+# 파일 업로드 경로 설정
+app:
+  upload:
+    dir: ${user.home}/uploads/travel

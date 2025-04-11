@@ -71,27 +71,28 @@ public class TravelPlanService {
 
         // GPT로 일정 JSON 생성
         TravelPlan plan = planDTO.toEntity();
-        
+
         // User 정보 처리
         if (plan.getUser() != null) {
             try {
                 // ID로 사용자 조회
                 if (plan.getUser().getId() != null && plan.getUser().getId() > 0) {
                     User dbUser = userRepository.findById(plan.getUser().getId())
-                        .orElseThrow(() -> new ResourceNotFoundException("User", "id", plan.getUser().getId()));
+                            .orElseThrow(() -> new ResourceNotFoundException("User", "id", plan.getUser().getId()));
                     plan.setUser(dbUser);
-                } 
+                }
                 // Username으로 사용자 조회
                 else if (plan.getUser().getUsername() != null && !plan.getUser().getUsername().isEmpty()) {
                     User dbUser = userRepository.findByUsername(plan.getUser().getUsername())
-                        .orElseThrow(() -> new ResourceNotFoundException("User", "username", plan.getUser().getUsername()));
+                            .orElseThrow(() -> new ResourceNotFoundException("User", "username",
+                                    plan.getUser().getUsername()));
                     plan.setUser(dbUser);
                 }
             } catch (Exception e) {
                 throw new BadRequestException("사용자 정보를 처리하는 중 오류가 발생했습니다: " + e.getMessage());
             }
         }
-        
+
         try {
             String planContent = gptService.generatePlanContent(plan);
 
@@ -141,28 +142,28 @@ public class TravelPlanService {
                 .orElseThrow(() -> new ResourceNotFoundException("TravelPlan", "planId", planId));
 
         // 권한 확인 로직 개선
-        log.info("확인 - 요청 사용자 ID: {}, 여행 계획 소유자: {}", userId, 
-                 travelPlan.getUser() != null ? travelPlan.getUser().getId() : "없음");
-                 
+        log.info("확인 - 요청 사용자 ID: {}, 여행 계획 소유자: {}", userId,
+                travelPlan.getUser() != null ? travelPlan.getUser().getId() : "없음");
+
         // 테스트 및 개발 환경에서는 권한 검사를 우회할 수 있도록 설정
         boolean skipAuthCheck = false;
-        
+
         // 개발 환경일 경우 권한 검사 우회 (환경 변수 또는 프로필 기반)
         String activeProfile = System.getProperty("spring.profiles.active");
         if (activeProfile != null && (activeProfile.equals("dev") || activeProfile.equals("test"))) {
             skipAuthCheck = true;
             log.warn("개발 모드: 여행 계획 권한 검사 우회");
         }
-        
+
         // 실제 권한 확인 로직
-        if (!skipAuthCheck && (travelPlan.getUser() == null || 
-                (travelPlan.getUser().getId() != null && 
-                 !travelPlan.getUser().getId().toString().equals(userId) && 
-                 !userId.equals(travelPlan.getUser().getUsername())))) {
-            log.warn("여행 계획({})에 대한 권한 거부 - 요청자: {}, 소유자: {}/{}", 
-                      planId, userId, 
-                      travelPlan.getUser() != null ? travelPlan.getUser().getId() : "없음",
-                      travelPlan.getUser() != null ? travelPlan.getUser().getUsername() : "없음");
+        if (!skipAuthCheck && (travelPlan.getUser() == null ||
+                (travelPlan.getUser().getId() != null &&
+                        !travelPlan.getUser().getId().toString().equals(userId) &&
+                        !userId.equals(travelPlan.getUser().getUsername())))) {
+            log.warn("여행 계획({})에 대한 권한 거부 - 요청자: {}, 소유자: {}/{}",
+                    planId, userId,
+                    travelPlan.getUser() != null ? travelPlan.getUser().getId() : "없음",
+                    travelPlan.getUser() != null ? travelPlan.getUser().getUsername() : "없음");
             throw new BadRequestException("해당 여행 계획에 대한 권한이 없습니다.");
         }
 
@@ -183,9 +184,10 @@ public class TravelPlanService {
         travelPlanRepository.save(travelPlan);
 
         // Schedule 저장
-        log.info("일정 저장 - scheduleJson: {}", schedule.getScheduleJson().substring(0, Math.min(100, schedule.getScheduleJson().length())) + "...");
+        log.info("일정 저장 - scheduleJson: {}",
+                schedule.getScheduleJson().substring(0, Math.min(100, schedule.getScheduleJson().length())) + "...");
         Schedule savedSchedule = scheduleRepository.save(schedule);
-        
+
         return ScheduleDTO.fromEntity(savedSchedule);
     }
 
